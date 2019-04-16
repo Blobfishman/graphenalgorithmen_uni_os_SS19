@@ -105,4 +105,9 @@ public interface Graph {
 	 */
 	public boolean isDirected();
 
+	/**
+	 * Prints the graph to stdout
+	 */
+	public void print();
+
 }

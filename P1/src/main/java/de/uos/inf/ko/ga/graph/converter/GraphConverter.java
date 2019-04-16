@@ -6,6 +6,8 @@ import de.uos.inf.ko.ga.graph.impl.DirectedGraphMatrix;
 import de.uos.inf.ko.ga.graph.impl.UndirectedGraphList;
 import de.uos.inf.ko.ga.graph.impl.UndirectedGraphMatrix;
 
+import java.util.List;
+
 /**
  * Methods for converting between list and matrix representations of graphs.
  */
@@ -23,8 +25,8 @@ public class GraphConverter {
 			/* TODO: implement me! */
 			return new DirectedGraphList();
 		} else {
-			/* TODO: implement me! */
-			return new UndirectedGraphList();
+			Graph g = new UndirectedGraphList();
+			return rebuildUndirected(graph,g);
 		}
 	}
 
@@ -40,9 +42,30 @@ public class GraphConverter {
 			/* TODO: implement me! */
 			return new DirectedGraphMatrix();
 		} else {
-			/* TODO: implement me! */
-			return new UndirectedGraphMatrix();
+			Graph g = new UndirectedGraphMatrix();
+			return rebuildUndirected(graph,g);
 		}
+	}
+
+	private static Graph rebuildUndirected(Graph ori, Graph dest){
+		dest.addVertices(ori.getVertexCount());
+		List<Integer> l;
+		for(int i = 0; i< ori.getVertexCount(); i++){
+			l = ori.getNeighbors(i);
+			for(Integer e: l){
+				double weight;
+				if(ori.getEdgeWeight(i,e) < Double.POSITIVE_INFINITY){
+					weight = ori.getEdgeWeight(i,e);
+				}
+				else{
+					weight = 0;
+				}
+				dest.addEdge(i,e,weight);
+			}
+			l.clear();
+		}
+		return dest;
+
 	}
 
 }

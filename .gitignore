@@ -1,3 +1,6 @@
+#Folder
+*/.idea/*
+
 # Compiled class file
 *.class
 
@@ -24,3 +27,13 @@ hs_err_pid*
 
 #target
 */target/*
+
+P1/\.idea/
+
+P1/src/main/java/de/uos/inf/ko/ga/graph/Test\.java
+
+P1/g1\.png
+
+P1/g2\.png
+
+P1/ga-uebung02\.iml

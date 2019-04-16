@@ -93,4 +93,9 @@ public class DirectedGraphList implements Graph {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void print() {
+
+	}
 }
