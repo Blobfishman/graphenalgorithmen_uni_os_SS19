@@ -12,10 +12,8 @@ import de.uos.inf.ko.ga.graph.util.NoVertexExcept;
  */
 public class UndirectedGraphMatrix implements Graph {
 
-	private final int SIZE = 16;
-	private int counter = 0;
 	private boolean weighted = false;
-	private  double[][] mat = new double[SIZE][SIZE];
+	private  double[][] mat = new double[1][];
 
 	@Override
 	public void addEdge(int start, int end) {
@@ -30,19 +28,25 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addVertex() {
-		counter++;
-		checkAndFixSize();
+		double[][] new_mat = new double[mat.length+1][mat.length+1];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
 	public void addVertices(int n) {
-		counter += n;
-		checkAndFixSize();
+		double[][] new_mat = new double[mat.length+n][mat.length+n];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
 	public List<Integer> getNeighbors(int v) {
-		List<Integer> l = new ArrayList<Integer>();
+		List<Integer> l = new ArrayList<>();
 		if(checkBounds(v,v)){
 			for(int i = 0; i < mat.length;i++){
 				if(mat[v][i] >0 ){
@@ -65,7 +69,7 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public int getVertexCount() {
-		return counter;
+		return mat.length;
 	}
 
 	@Override
@@ -96,7 +100,11 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void removeVertex() {
-		counter --;
+		double[][] new_mat = new double[mat.length-1][mat.length-1];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
@@ -109,36 +117,20 @@ public class UndirectedGraphMatrix implements Graph {
 		return false;
 	}
 
-	/**
-	 * If array has not enouth space double the size and copy all old data
-	 * to the new array
-	 */
-	private  void checkAndFixSize(){
-		if(counter > SIZE){
-			double[][] new_mat = new double[2*mat.length][2* mat.length];
-			for(int i = 0; i < mat.length; i++){
-				for(int j = 0; j < mat.length; j++){
-					new_mat[i][j] = mat[i][j];
-				}
-			}
-			mat = new_mat;
-		}
-	}
-
 	private boolean checkBounds(int start, int end){
-		if(start > counter || end > counter)
+		if(start > mat.length || end > mat.length)
 		{
 			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
-			//throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
+//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
 			return false;
 		}
 		return true;
 	}
 
 	public void print(){
-		for(int i = 0; i < mat.length; i++){
-			for(int j = 0; j < mat.length; j++){
-				System.out.printf("%.3f ", mat[i][j]);
+		for (double[] doubles : mat) {
+			for (int j = 0; j < mat.length; j++) {
+				System.out.printf("%.3f ", doubles[j]);
 			}
 			System.out.println();
 		}

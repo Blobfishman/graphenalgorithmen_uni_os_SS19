@@ -1,5 +1,6 @@
 package de.uos.inf.ko.ga.graph.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.uos.inf.ko.ga.graph.Graph;
@@ -10,92 +11,145 @@ import de.uos.inf.ko.ga.graph.Graph;
  */
 public class DirectedGraphMatrix implements Graph {
 
+	private boolean weighted = false;
+	private  double[][] mat = new double[0][1];
+
 	@Override
 	public void addEdge(int start, int end) {
-		// TODO Auto-generated method stub
-		
+		mat[start][end] = 1;
 	}
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
-		// TODO Auto-generated method stub
-		
+		if(weight != 0) weighted = true;
+		mat[start][end] = weight;
 	}
 
 	@Override
 	public void addVertex() {
-		// TODO Auto-generated method stub
-		
+		double[][] new_mat = new double[mat.length+1][mat.length+1];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
 	public void addVertices(int n) {
-		// TODO Auto-generated method stub
-		
+		double[][] new_mat = new double[mat.length+n][mat.length+n];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
 	public List<Integer> getNeighbors(int v) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Integer> list = getPredecessors(v);
+		list.addAll(getSuccessors(v));
+
+		for (int i=0; i<list.size(); i++) {
+			if(list.lastIndexOf(list.get(i)) != list.indexOf(list.get(i))) {
+				list.remove(list.lastIndexOf(list.get(i)));
+			}
+		}
+
+		return list;
 	}
 
 	@Override
 	public List<Integer> getPredecessors(int v) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Integer> l = new ArrayList<>();
+		if(checkBounds(v,v)){
+			for(int i = 0; i < mat.length;i++){
+				if(mat[i][v] >0 ){
+					l.add(i);
+				}
+			}
+		}
+		return l;
 	}
 
 	@Override
 	public List<Integer> getSuccessors(int v) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Integer> l = new ArrayList<>();
+		if(checkBounds(v,v)){
+			for(int i = 0; i < mat.length;i++){
+				if(mat[v][i] > 0 ){
+					l.add(i);
+				}
+			}
+		}
+		return l;
 	}
 
 	@Override
 	public int getVertexCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return mat.length;
 	}
 
 	@Override
 	public double getEdgeWeight(int start, int end) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(checkBounds(start,end))
+		{
+			return (mat[start][end]> 0) ? mat[start][end] : Double.POSITIVE_INFINITY ;
+		}
+		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
 	public boolean hasEdge(int start, int end) {
-		// TODO Auto-generated method stub
+		if(checkBounds(start,end))
+		{
+			return mat[start][end] != 0;
+		}
 		return false;
 	}
 
 	@Override
 	public void removeEdge(int start, int end) {
-		// TODO Auto-generated method stub
-		
+		if(checkBounds(start,end))
+		{
+			mat[start][end] = 0;
+		}
 	}
 
 	@Override
 	public void removeVertex() {
-		// TODO Auto-generated method stub
-		
+		double[][] new_mat = new double[mat.length-1][mat.length-1];
+		for(int i = 0; i < mat.length; i++){
+			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		}
+		mat = new_mat;
 	}
 
 	@Override
 	public boolean isWeighted() {
-		// TODO Auto-generated method stub
-		return false;
+		return weighted;
 	}
 
 	@Override
 	public boolean isDirected() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
-	@Override
-	public void print() {
-
+	private boolean checkBounds(int start, int end){
+		if(start > mat.length || end > mat.length)
+		{
+			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
+//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
+			return false;
+		}
+		return true;
 	}
+
+	public void print(){
+		for (double[] doubles : mat) {
+			for (int j = 0; j < mat.length; j++) {
+				System.out.printf("%.3f ", doubles[j]);
+			}
+			System.out.println();
+		}
+	}
+
 }

@@ -1,0 +1,59 @@
+--------------------------------------------------------------------------------
+--       Dateiformat fuer einzulesende Graphen mit Dateiendung ".gra"         --
+--------------------------------------------------------------------------------
+
+1.) Die Datei beginnt mit der Anzahl der Knoten des darin enthaltenen Graphen. 
+    Die Angabe wird durch ein "n" mit nachfolgendem Leerzeichen eingeleitet.
+    
+    n <Anzahl Knoten>
+    
+    Bsp. für einen Graphen mit 20 Knoten: 
+    n 20
+    
+2.) Danach folgt die Angabe der Kanten des Graphen in Form einer Adjazenzmatrix.
+    Jede Zeile besteht aus dem Namen des Knoten, gefolgt von einem Leerzeichen,
+    einem Doppelpunkt und einem weiteren Leerzeichen. Danach folgt eine durch
+    Leerzeichen getrennte Liste der Matrixeinträge.
+    
+    Beispiel-Zeile für einen Graphen mit 6 Knoten: 
+    4 : x x x 1 x 1
+    
+    (Es können evtl. Leerzeichen vor dem Namen des Knoten stehen)
+
+    Ein "x" bedeutet, dass eine Kante nicht existiert. Eine Zahl gibt das Gewicht
+    der Kante an und darf positiv, negativ oder auch Null sein.
+
+    Liegt ein ungerichteter Graph vor, so darf angenommen werden, dass die
+    gegebene Matrix symmetrisch ist.
+    
+3.) In jeder Zeile der Datei darf ein durch '#' eingeleiteter Kommentar stehen, 
+    der die komplette Zeile umfassen muss. Dies bedeutet, dass '#' immer das 
+    erste Zeichen einer Kommentarzeile sein muss.
+    
+    Ein vollständiges Beispiel für eine Eingabedatei:
+
+    # Number of Nodes:
+    n 6
+    # Adjacency matrix:
+    0 : x 1 1 x x x 
+    1 : x x x 1 1 x 
+    2 : x 1 x 1 x 1 
+    3 : x x x x 1 1 
+    4 : x x x x x 1 
+    5 : x x x x x x 
+
+4.) Für ungewichtete Graphen gilt die Konvention, dass die Matrixeinträge entweder
+    "x" oder "1" sind. Falls ein (kanten-) gewichteter Graph vorliegt, so können
+    auch Matrixeinträge auftreten, die nicht gleich 1 sein müssen.
+    
+    Beispiel für einen (ungerichteten) gewichteten Graphen:
+    
+    # Number of nodes:
+    n 6
+    # Adjacency matrix including weights:
+    0 : x 4 2 x x x 
+    1 : 4 x 5 9 6 x
+    2 : 2 5 x 8 x 7
+    3 : x 9 8 x 3 9
+    4 : x 6 x 3 x 9
+    5 : x x 7 9 9 x

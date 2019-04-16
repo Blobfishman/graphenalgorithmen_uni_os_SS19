@@ -10,10 +10,8 @@ import de.uos.inf.ko.ga.graph.util.Pair;
  *
  */
 public class UndirectedGraphList implements Graph {
-
-	private int counter = 0;
 	private boolean weighted = false;
-	private HashMap<Integer, ArrayList<Pair<Integer,Double>>> lists = new HashMap<>();
+	private ArrayList<ArrayList<Pair<Integer,Double>>> lists = new ArrayList<>();
 
 	@Override
 	public void addEdge(int start, int end) {
@@ -31,18 +29,14 @@ public class UndirectedGraphList implements Graph {
 
 	@Override
 	public void addVertex() {
-		lists.put(counter,new ArrayList<>());
-		counter++;
-		
+		lists.add(lists.size(), new ArrayList<>());
 	}
 
 	@Override
 	public void addVertices(int n) {
 		for(int i = 0; i < n; i++){
-			lists.put(counter,new ArrayList<>());
-			counter++;
+			lists.add(lists.size(), new ArrayList<>());
 		}
-		
 	}
 
 	@Override
@@ -68,7 +62,7 @@ public class UndirectedGraphList implements Graph {
 
 	@Override
 	public int getVertexCount() {
-		return counter;
+		return lists.size();
 	}
 
 	@Override
@@ -85,8 +79,8 @@ public class UndirectedGraphList implements Graph {
 	public boolean hasEdge(int start, int end) {
 		if(!checkBounds(start,end)) return false;
 		Pair<Integer,Double> tmp;
-		for(Iterator<Pair<Integer,Double>> it = lists.get(start).iterator(); it.hasNext();) {
-			tmp = it.next();
+		for (Pair<Integer, Double> integerDoublePair : lists.get(start)) {
+			tmp = integerDoublePair;
 			if (tmp != null && tmp.getFirst() == end) return true;
 		}
 		return false;
@@ -95,21 +89,14 @@ public class UndirectedGraphList implements Graph {
 	@Override
 	public void removeEdge(int start, int end) {
 		if(checkBounds(start,end)) {
-			for(Iterator<Pair<Integer,Double>> it = lists.get(start).iterator(); it.hasNext();){
-				Pair<Integer,Double> tmp = it.next();
-				if(tmp.getFirst() == end) it.remove();
-			}
-			for(Iterator<Pair<Integer,Double>> it = lists.get(end).iterator(); it.hasNext();){
-				Pair<Integer,Double> tmp = it.next();
-				if(tmp.getFirst() == start) it.remove();
-			}
+			lists.get(start).removeIf(tmp -> tmp.getFirst() == end);
+			lists.get(end).removeIf(tmp -> tmp.getFirst() == start);
 		}
 	}
 
 	@Override
 	public void removeVertex() {
-		lists.remove(counter -1);
-		counter--;
+		lists.remove(lists.size()-1);
 	}
 
 	@Override
@@ -129,7 +116,7 @@ public class UndirectedGraphList implements Graph {
 
 
 	private boolean checkBounds(int start, int end){
-		if(start > counter || end > counter)
+		if(start > lists.size() || end > lists.size())
 		{
 			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
 			//throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
