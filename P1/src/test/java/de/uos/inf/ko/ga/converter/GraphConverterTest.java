@@ -123,8 +123,10 @@ public class GraphConverterTest {
 		if (graph.isDirected()) {
 			for (int u = 0; u < n; ++u) {
 				for (int v = 0; v < n; ++v) {
-					if (random.nextDouble() <= p) {
-						graph.addEdge(u, v, random.nextDouble());
+					if (u != v) {
+						if (random.nextDouble() <= p) {
+							graph.addEdge(u, v, random.nextDouble());
+						}
 					}
 				}
 			}
