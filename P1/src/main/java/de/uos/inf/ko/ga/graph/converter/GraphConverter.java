@@ -22,11 +22,12 @@ public class GraphConverter {
 	 */
 	public static Graph toList(Graph graph) {
 		if (graph.isDirected()) {
-			/* TODO: implement me! */
-			return new DirectedGraphList();
+			Graph g = new DirectedGraphList();
+
+			return rebuildGraph(graph,g);
 		} else {
 			Graph g = new UndirectedGraphList();
-			return rebuildUndirected(graph,g);
+			return rebuildGraph(graph,g);
 		}
 	}
 
@@ -39,19 +40,19 @@ public class GraphConverter {
 	 */
 	public static Graph toMatrix(Graph graph) {
 		if (graph.isDirected()) {
-			/* TODO: implement me! */
-			return new DirectedGraphMatrix();
+			Graph g = new DirectedGraphMatrix();
+			return rebuildGraph(graph,g);
 		} else {
 			Graph g = new UndirectedGraphMatrix();
-			return rebuildUndirected(graph,g);
+			return rebuildGraph(graph,g);
 		}
 	}
 
-	private static Graph rebuildUndirected(Graph ori, Graph dest){
+	private static Graph rebuildGraph(Graph ori, Graph dest){
 		dest.addVertices(ori.getVertexCount());
 		List<Integer> l;
 		for(int i = 0; i< ori.getVertexCount(); i++){
-			l = ori.getNeighbors(i);
+			l = ori.getSuccessors(i);
 			for(Integer e: l){
 				double weight;
 				if(ori.getEdgeWeight(i,e) < Double.POSITIVE_INFINITY){
@@ -65,6 +66,8 @@ public class GraphConverter {
 			l.clear();
 		}
 		return dest;
+
+
 
 	}
 

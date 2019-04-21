@@ -16,7 +16,7 @@ public class DirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addEdge(int start, int end) {
-		mat[start][end] = 1;
+		addEdge(start,end,1.0);
 	}
 
 	@Override

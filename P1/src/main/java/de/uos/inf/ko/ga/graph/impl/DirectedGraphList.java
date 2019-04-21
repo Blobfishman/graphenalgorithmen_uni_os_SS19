@@ -17,7 +17,7 @@ public class DirectedGraphList implements Graph {
 
 	@Override
 	public void addEdge(int start, int end) {
-		lists.get(start).add(new Pair<>(end,1.0));
+		addEdge(start,end, 1.0);
 	}
 
 	@Override
