@@ -1,146 +1,89 @@
 package de.uos.inf.ko.ga.graph.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uos.inf.ko.ga.graph.Graph;
-import de.uos.inf.ko.ga.graph.util.NoVertexExcept;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Implementation of a undirected graph with a matrix representation of the edges.
- *
+ * XXXXX
+ * XXXX
+ * XXX
+ * XX
+ * X
  */
 public class UndirectedGraphMatrix implements Graph {
 
-
 	private boolean weighted = false;
-	private  double[][] mat = new double[0][1];
+	private double[][] matrix = new double[0][0];
 
 	@Override
 	public void addEdge(int start, int end) {
-		if (start > end)
-			mat[start][end] = 1;
+		if (!checkBounds(start) || !checkBounds(end))
+			return;
+		if (start>end)
+			matrix[start][end] = 1;
 		else
-			mat[end][start] = 1;
+			matrix[end][start] = 1;
 	}
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
-		if(weight != 0) weighted = true;
-		if (start > end)
-			mat[start][end] = weight;
+		if (!checkBounds(start) ||  checkBounds(end))
+			return;
+		weighted = true;
+		if(start>end)
+			matrix[start][end] = weight;
 		else
-			mat[end][start] = weight;
+			matrix[end][start] = weight;
 	}
 
 	@Override
 	public void addVertex() {
-//		double[][] new_mat = new double[mat.length+1][];
-//		for (int i=0; i < new_mat.length; i++) {
-//			new_mat[i] = new double[new_mat.length-i];
-//			if (i < mat.length) // copy array as long as i is in range of the mat array index
-//				System.arraycopy(mat[i], 0, new_mat[i], 0, mat[i].length);
-//		}
-//		mat = new_mat;
-		addVertices(1);
+		for (int i=0; i<matrix.length; i++) {
+			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length+1);
+			matrix[i][matrix[i].length-1] = Double.POSITIVE_INFINITY;
+		}
+		matrix = Arrays.copyOf(matrix, matrix.length+1);
+		double[] a = {Double.POSITIVE_INFINITY};
+		matrix[matrix.length-1] = a;
 	}
 
 	@Override
 	public void addVertices(int n) {
-		double[][] new_mat = new double[mat.length+n][];
-		for (int i=0; i < new_mat.length; i++) {
-			new_mat[i] = new double[new_mat.length-i];
-			if (i < mat.length) // copy array as long as i is in range of the mat array index
-				System.arraycopy(mat[i], 0, new_mat[i], 0, mat[i].length);
-		}
-		mat = new_mat;
-	}
+//		double[][] new_mat = new double[matrix.length+n][];
+//		for (int i=0; i<new_mat.length; i++) {
+//			new_mat[i] = new double[new_mat.length-i];
+//			if (i < matrix.length)
+//				System.arraycopy(matrix[i], 0, new_mat[i], 0, matrix[i].length);
+//		}
+//		matrix = new_mat;
 
-	@Override
-	public int getVertexCount() {
-		return mat.length;
-	}
-
-	@Override
-	public double getEdgeWeight(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			if (start > end)
-				return (mat[start][end]> 0) ? mat[start][end] : Double.POSITIVE_INFINITY ;
-			else
-				return (mat[end][start]> 0) ? mat[end][start] : Double.POSITIVE_INFINITY ;
-		}
-		return Double.POSITIVE_INFINITY;
-	}
-
-	@Override
-	public boolean hasEdge(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			if (start > end)
-				return mat[start][end] != 0;
-			else
-				return mat[end][start] != 0;
-		}
-		return false;
-	}
-
-	@Override
-	public void removeEdge(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			if(start > end)
-				mat[start][end] = 0;
-			else
-				mat[end][start] = 0;
-		}
-	}
-
-	@Override
-	public void removeVertex() {
-		double[][] new_mat = new double[mat.length-1][];
-		for(int i = 0; i < new_mat.length; i++){
-			new_mat[i] = new double[new_mat.length-i];
-			System.arraycopy(mat[i], 0, new_mat[i], 0, new_mat[i].length);
-		}
-		mat = new_mat;
-	}
-
-	@Override
-	public boolean isWeighted() {
-		return weighted;
-	}
-
-
-	private boolean checkBounds(int start, int end){
-		if(start > mat.length || end > mat.length)
-		{
-			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
-//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
-			return false;
-		}
-		return true;
-	}
-
-	public void print(){
-		for (double[] doubles : mat) {
-			for (double aDouble : doubles) {
-				System.out.printf("%.3f ", aDouble);
-			}
-			System.out.println();
+		for(int i=0; i<n; i++) {
+			addVertex();
 		}
 	}
 
 	@Override
 	public List<Integer> getNeighbors(int v) {
 		List<Integer> l = new ArrayList<>();
-		if(checkBounds(v,v)){
-			for(int i = 0; i < mat[v].length;i++){
-				if(mat[v][i] >0 ){
-					l.add(i);
-				}
-			}
+		if (!checkBounds(v))
+			return l;
+		//get all neighbors in the column of v
+		for ( int i=0; i<matrix[v].length; i++) {
+			if(matrix[v][i] != Double.POSITIVE_INFINITY)
+				l.add(i);
 		}
+		//check if v is neighbors of note >v(index)
+		for (int i=v+1; i<matrix.length; i++) {
+			if (matrix[i].length <= v)
+				continue;
+			if(matrix[i][v] != Double.POSITIVE_INFINITY)
+				l.add(i);
+		}
+
 		return l;
 	}
 
@@ -155,8 +98,71 @@ public class UndirectedGraphMatrix implements Graph {
 	}
 
 	@Override
+	public int getVertexCount() {
+		return matrix.length;
+	}
+
+	@Override
+	public double getEdgeWeight(int start, int end) {
+		if (!checkBounds(start) || !checkBounds(end))
+			return 0;
+		if(start>end)
+			return matrix[start][end] == 0 ? Double.POSITIVE_INFINITY : matrix[start][end];
+		else
+			return matrix[end][start] == 0 ? Double.POSITIVE_INFINITY : matrix[end][start];
+	}
+
+	@Override
+	public boolean hasEdge(int start, int end) {
+		if (!checkBounds(start) || !checkBounds(end))
+			return false;
+		if(start>end)
+			return matrix[start][end] != Double.POSITIVE_INFINITY;
+		else
+			return matrix[end][start] != Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public void removeEdge(int start, int end) {
+		if (!checkBounds(start) || !checkBounds(end))
+			return;
+		if(start>end)
+			matrix[start][end] = Double.POSITIVE_INFINITY;
+		else
+			matrix[end][start] = Double.POSITIVE_INFINITY;
+	}
+
+	@Override
+	public void removeVertex() {
+		matrix = Arrays.copyOf(matrix, matrix.length-1);
+		for (int i=0; i<matrix.length; i++) {
+			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length-1);
+		}
+	}
+
+	@Override
+	public boolean isWeighted() {
+		return weighted;
+	}
+
+	@Override
 	public boolean isDirected() {
 		return false;
+	}
+
+	@Override
+	public void print() {
+		for (double[] matrix1 : matrix) {
+			for (double v : matrix1) {
+				System.out.print(v + " ");
+			}
+			System.out.println();
+		}
+	}
+
+	private boolean checkBounds(int v) {
+		//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + v );
+		return matrix.length > v && v >= 0;
 	}
 
 }

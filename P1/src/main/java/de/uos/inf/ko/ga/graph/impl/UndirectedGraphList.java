@@ -114,7 +114,6 @@ public class UndirectedGraphList implements Graph {
 
 	}
 
-
 	private boolean checkBounds(int start, int end){
 		if(start > lists.size() || end > lists.size())
 		{
