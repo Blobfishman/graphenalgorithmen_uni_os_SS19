@@ -1,7 +1,9 @@
 package de.uos.inf.ko.ga.graph.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.zip.DeflaterOutputStream;
 
 import de.uos.inf.ko.ga.graph.Graph;
 
@@ -16,22 +18,19 @@ public class DirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addEdge(int start, int end) {
-		addEdge(start,end,1.0);
+		addEdge(start, end, 0);
 	}
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
-		if(weight != 0) weighted = true;
+		if (!checkBounds(start, end)) return;
+		if (weight != 0) weighted = true;
 		mat[start][end] = weight;
 	}
 
 	@Override
 	public void addVertex() {
-		double[][] new_mat = new double[mat.length+1][mat.length+1];
-		for(int i = 0; i < mat.length; i++){
-			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
-		}
-		mat = new_mat;
+		addVertices(1);
 	}
 
 	@Override
@@ -39,6 +38,10 @@ public class DirectedGraphMatrix implements Graph {
 		double[][] new_mat = new double[mat.length+n][mat.length+n];
 		for(int i = 0; i < mat.length; i++){
 			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+			Arrays.fill(new_mat[i], mat.length, new_mat.length-1, Double.POSITIVE_INFINITY);
+		}
+		for (int i = mat.length; i<new_mat.length; i++){
+			Arrays.fill(new_mat[i], Double.POSITIVE_INFINITY);
 		}
 		mat = new_mat;
 	}
@@ -62,7 +65,7 @@ public class DirectedGraphMatrix implements Graph {
 		List<Integer> l = new ArrayList<>();
 		if(checkBounds(v,v)){
 			for(int i = 0; i < mat.length;i++){
-				if(mat[i][v] >0 ){
+				if(mat[i][v] != Double.POSITIVE_INFINITY ){
 					l.add(i);
 				}
 			}
@@ -75,7 +78,7 @@ public class DirectedGraphMatrix implements Graph {
 		List<Integer> l = new ArrayList<>();
 		if(checkBounds(v,v)){
 			for(int i = 0; i < mat.length;i++){
-				if(mat[v][i] > 0 ){
+				if(mat[v][i] != Double.POSITIVE_INFINITY ){
 					l.add(i);
 				}
 			}
@@ -92,7 +95,7 @@ public class DirectedGraphMatrix implements Graph {
 	public double getEdgeWeight(int start, int end) {
 		if(checkBounds(start,end))
 		{
-			return (mat[start][end]> 0) ? mat[start][end] : Double.POSITIVE_INFINITY ;
+			return mat[start][end];
 		}
 		return Double.POSITIVE_INFINITY;
 	}
@@ -101,7 +104,7 @@ public class DirectedGraphMatrix implements Graph {
 	public boolean hasEdge(int start, int end) {
 		if(checkBounds(start,end))
 		{
-			return mat[start][end] != 0;
+			return mat[start][end] != Double.POSITIVE_INFINITY;
 		}
 		return false;
 	}
@@ -110,7 +113,7 @@ public class DirectedGraphMatrix implements Graph {
 	public void removeEdge(int start, int end) {
 		if(checkBounds(start,end))
 		{
-			mat[start][end] = 0;
+			mat[start][end] = Double.POSITIVE_INFINITY;
 		}
 	}
 
