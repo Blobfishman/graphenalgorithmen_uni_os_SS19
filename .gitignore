@@ -1,5 +1,6 @@
 #Folder
 */.idea/*
+*/.settings/*
 
 # Compiled class file
 *.class
@@ -37,3 +38,9 @@ P1/g1\.png
 P1/g2\.png
 
 P1/ga-uebung02\.iml
+
+P1/\.settings/
+
+P1/\.classpath
+
+*.png

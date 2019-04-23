@@ -1,9 +1,7 @@
 package de.uos.inf.ko.ga.graph.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.zip.DeflaterOutputStream;
 
 import de.uos.inf.ko.ga.graph.Graph;
 
@@ -13,146 +11,182 @@ import de.uos.inf.ko.ga.graph.Graph;
  */
 public class DirectedGraphMatrix implements Graph {
 
-	private boolean weighted = false;
-	private  double[][] mat = new double[0][1];
+	//matrix representation of the edges
+	public double[][] matrix;
 
-	@Override
+	/**
+	 * Constructor, which initializes the matrix
+	 *
+	 */
+	public DirectedGraphMatrix(){
+		matrix = new double[0][0];
+	}
+
 	public void addEdge(int start, int end) {
-		addEdge(start, end, 0);
+		//only create edge if its not a loop
+		if(start != end){
+			//call the eddEdge method which has the weight as an additional parameter
+			this.addEdge(start, end, 1);
+		}
+
 	}
 
-	@Override
+
 	public void addEdge(int start, int end, double weight) {
-		if (!checkBounds(start, end)) return;
-		if (weight != 0) weighted = true;
-		mat[start][end] = weight;
+		//only create edge if its not a loop
+		if(start != end){
+			//store the weight at the proper place
+			matrix[start][end] = weight;
+		}
+
 	}
 
-	@Override
+
 	public void addVertex() {
-		addVertices(1);
+		//copy the old matrix
+		double[][] old = matrix.clone();
+		int size = matrix.length;
+		//enlarge the matrix by one
+		matrix = new double[size+1][size+1];
+		//put the old values back inside the matrix
+		for(int i=0; i<old.length;i++){
+			for(int j=0; j<old[i].length;j++){
+				matrix[i][j] = old[i][j];
+			}
+		}
+
 	}
 
-	@Override
+
 	public void addVertices(int n) {
-		double[][] new_mat = new double[mat.length+n][mat.length+n];
-		for(int i = 0; i < mat.length; i++){
-			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
-			Arrays.fill(new_mat[i], mat.length, new_mat.length-1, Double.POSITIVE_INFINITY);
+		//call the addVertex() method n-times
+		for(int i=0;i<n;i++){
+			addVertex();
 		}
-		for (int i = mat.length; i<new_mat.length; i++){
-			Arrays.fill(new_mat[i], Double.POSITIVE_INFINITY);
-		}
-		mat = new_mat;
 	}
 
-	@Override
+
 	public List<Integer> getNeighbors(int v) {
-		List<Integer> list = getPredecessors(v);
-		list.addAll(getSuccessors(v));
-
-		for (int i=0; i<list.size(); i++) {
-			if(list.lastIndexOf(list.get(i)) != list.indexOf(list.get(i))) {
-				list.remove(list.lastIndexOf(list.get(i)));
+		//check if the vertex exists
+		if(matrix.length < v+1) throw new IllegalArgumentException();
+		//create list, which is returned in the end and store all predecessors in it
+		List<Integer> ret = new ArrayList<Integer>();
+		ret.addAll(getPredecessors(v));
+		//create list and store all successors in it
+		List<Integer> suc = new ArrayList<Integer>();
+		suc = getSuccessors(v);
+		//check which successors need to be added, to prevent duplicates
+		for(int i=0;i<suc.size();i++){
+			if(!ret.contains(suc.get(i))){
+				ret.add(suc.get(i));
 			}
 		}
 
-		return list;
+		return ret;
 	}
 
-	@Override
+
 	public List<Integer> getPredecessors(int v) {
-		List<Integer> l = new ArrayList<>();
-		if(checkBounds(v,v)){
-			for(int i = 0; i < mat.length;i++){
-				if(mat[i][v] != Double.POSITIVE_INFINITY ){
-					l.add(i);
-				}
+		//check if the vertex exists
+		if(matrix.length < v+1) throw new IllegalArgumentException();
+		//create list, which is returned in the end
+		List<Integer> ret = new ArrayList<Integer>();
+		//go throw the column
+		for(int i=0;i<matrix.length;i++){
+			//look for any existing edges
+			if(matrix[i][v] != 0){
+				ret.add(i);
 			}
 		}
-		return l;
+		return ret;
 	}
 
-	@Override
+
 	public List<Integer> getSuccessors(int v) {
-		List<Integer> l = new ArrayList<>();
-		if(checkBounds(v,v)){
-			for(int i = 0; i < mat.length;i++){
-				if(mat[v][i] != Double.POSITIVE_INFINITY ){
-					l.add(i);
-				}
+		//check if the vertex exists
+		if(matrix.length < v+1) throw new IllegalArgumentException();
+		//Create list, which is returned in the end
+		List<Integer> ret = new ArrayList<Integer>();
+		//go throw the line
+		for(int i=0; i<matrix[v].length;i++){
+			//look for any existing edges
+			if(matrix[v][i] != 0){
+				ret.add(i);
 			}
+
 		}
-		return l;
+		return ret;
 	}
 
-	@Override
+
 	public int getVertexCount() {
-		return mat.length;
+		return matrix.length;
 	}
 
-	@Override
+
 	public double getEdgeWeight(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			return mat[start][end];
-		}
-		return Double.POSITIVE_INFINITY;
+		//Check if the edge exists, if not return infinity
+		if(!hasEdge(start,end)) return Double.POSITIVE_INFINITY;
+		//return the weight, which is stored inside the matrix
+		return matrix[start][end];
 	}
 
-	@Override
+
 	public boolean hasEdge(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			return mat[start][end] != Double.POSITIVE_INFINITY;
+		//if start or end vertex does not exist, return false
+		if(start > getVertexCount()-1 || end > getVertexCount()-1) return false;
+		//look at the specific place inside the matrix and check if edge exists
+		if(matrix[start][end] != 0){
+			return true;
 		}
 		return false;
 	}
 
-	@Override
+
 	public void removeEdge(int start, int end) {
-		if(checkBounds(start,end))
-		{
-			mat[start][end] = Double.POSITIVE_INFINITY;
-		}
+		matrix[start][end] = 0;
 	}
 
-	@Override
+
 	public void removeVertex() {
-		double[][] new_mat = new double[mat.length-1][mat.length-1];
-		for(int i = 0; i < mat.length; i++){
-			System.arraycopy(mat[i], 0, new_mat[i], 0, mat.length);
+		//copy the old matrix
+		double[][] old = matrix.clone();
+		int size = matrix.length;
+		//decrease the size of every line and column by one
+		matrix = new double[size-1][size-1];
+		//put the old values back inside the matrix
+		for(int i=0;i<old.length-1;i++){
+			for(int j=0;j<old[i].length-1;j++){
+				matrix[i][j] = old[i][j];
+			}
 		}
-		mat = new_mat;
+
 	}
 
-	@Override
+
 	public boolean isWeighted() {
-		return weighted;
+		boolean flag = false;
+		//go throw the matrix and check if one value is not 1
+		for(int i=0;i<matrix.length;i++){
+			for(int j=0;j<matrix[i].length;j++){
+				if(matrix[i][j] != 0 && matrix[i][j] != 1) flag = true;
+			}
+		}
+
+		return flag;
 	}
 
-	@Override
+
 	public boolean isDirected() {
 		return true;
 	}
 
-	private boolean checkBounds(int start, int end){
-		if(start > mat.length || end > mat.length)
-		{
-			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
-//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
-			return false;
-		}
-		return true;
-	}
-
 	public void print(){
-		for (double[] doubles : mat) {
-			for (int j = 0; j < mat.length; j++) {
+		for (double[] doubles : matrix) {
+			for (int j = 0; j < matrix.length; j++) {
 				System.out.printf("%.3f ", doubles[j]);
 			}
 			System.out.println();
 		}
 	}
-
 }

@@ -17,50 +17,43 @@ import java.util.List;
 public class UndirectedGraphMatrix implements Graph {
 
 	private boolean weighted = false;
-	private double[][] matrix = new double[0][0];
+	private double[][] matrix;
+
+	public UndirectedGraphMatrix(){
+		matrix = new double[0][0];
+	}
 
 	@Override
 	public void addEdge(int start, int end) {
-		if (checkNotInBounds(start, end))
-			return;
-		if (start>end)
-			matrix[start][end] = 1;
-		else
-			matrix[end][start] = 1;
+		addEdge(start,end,1);
 	}
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
-		if (checkNotInBounds(start, end))
-			return;
-		weighted = true;
-		if(start>end)
+		//only create edge if its not a loop
+		if(start != end && !checkNotInBounds(start,end)){
+			//store the weight in line for start and in the line for end
 			matrix[start][end] = weight;
-		else
 			matrix[end][start] = weight;
+		}
 	}
 
 	@Override
 	public void addVertex() {
-		for (int i=0; i<matrix.length; i++) {
-			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length+1);
-			matrix[i][matrix[i].length-1] = Double.POSITIVE_INFINITY;
+		double[][] old = matrix.clone();
+		int size = matrix.length;
+		matrix = new double[size+1][size+1];
+		for(int i=0; i<old.length;i++){
+			for(int j=0; j<old[i].length;j++){
+				matrix[i][j] = old[i][j];
+			}
 		}
-		matrix = Arrays.copyOf(matrix, matrix.length+1);
-		double[] a = {Double.POSITIVE_INFINITY};
-		matrix[matrix.length-1] = a;
+		matrix[matrix.length -1][matrix.length -1] = Double.POSITIVE_INFINITY;
+
 	}
 
 	@Override
 	public void addVertices(int n) {
-//		double[][] new_mat = new double[matrix.length+n][];
-//		for (int i=0; i<new_mat.length; i++) {
-//			new_mat[i] = new double[new_mat.length-i];
-//			if (i < matrix.length)
-//				System.arraycopy(matrix[i], 0, new_mat[i], 0, matrix[i].length);
-//		}
-//		matrix = new_mat;
-
 		for(int i=0; i<n; i++) {
 			addVertex();
 		}
@@ -104,39 +97,38 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public double getEdgeWeight(int start, int end) {
-		if (checkNotInBounds(start, end))
-			return Double.POSITIVE_INFINITY;
-		if(start>end)
-			return matrix[start][end];
-		else
-			return matrix[end][start];
+		//Check if the edge exists, if not return infinity
+		if(!hasEdge(start,end)) return Double.POSITIVE_INFINITY;
+		//return the weight, which is stored inside the matrix
+		return matrix[start][end];
 	}
 
 	@Override
 	public boolean hasEdge(int start, int end) {
-		if (checkNotInBounds(start, end))
-			return false;
-		if(start>end)
-			return matrix[start][end] != Double.POSITIVE_INFINITY;
-		else
-			return matrix[end][start] != Double.POSITIVE_INFINITY;
+		if (checkNotInBounds(start, end)) return false;
+		if(matrix[start][end] != Double.POSITIVE_INFINITY){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public void removeEdge(int start, int end) {
-		if (checkNotInBounds(start, end))
-			return;
-		if(start>end)
-			matrix[start][end] = Double.POSITIVE_INFINITY;
-		else
-			matrix[end][start] = Double.POSITIVE_INFINITY;
+		matrix[start][end] = 0;
 	}
 
 	@Override
 	public void removeVertex() {
-		matrix = Arrays.copyOf(matrix, matrix.length-1);
-		for (int i=0; i<matrix.length; i++) {
-			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length-1);
+		//copy the old matrix
+		double[][] old = matrix.clone();
+		int size = matrix.length;
+		//decrease the size of every line and column by one
+		matrix = new double[size-1][size-1];
+		//put the old values back inside the matrix
+		for(int i=0;i<old.length-1;i++){
+			for(int j=0;j<old[i].length-1;j++){
+				matrix[i][j] = old[i][j];
+			}
 		}
 	}
 
