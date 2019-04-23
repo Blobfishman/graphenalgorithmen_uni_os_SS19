@@ -15,13 +15,13 @@ public class UndirectedGraphList implements Graph {
 
 	@Override
 	public void addEdge(int start, int end) {
-		addEdge(start,end,0);
+		addEdge(start,end,1);
 	}
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
 		if(checkBounds(start,end)){
-			if(weight != 0) weighted = true;
+			if(weight != 1) weighted = true;
 			lists.get(start).add(new Pair<>(end,weight));
 			lists.get(end).add(new Pair<>(start,weight));
 		}
