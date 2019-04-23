@@ -21,7 +21,7 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addEdge(int start, int end) {
-		if (!checkBounds(start) || !checkBounds(end))
+		if (checkNotInBounds(start, end))
 			return;
 		if (start>end)
 			matrix[start][end] = 1;
@@ -31,7 +31,7 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addEdge(int start, int end, double weight) {
-		if (!checkBounds(start) ||  checkBounds(end))
+		if (checkNotInBounds(start, end))
 			return;
 		weighted = true;
 		if(start>end)
@@ -69,7 +69,7 @@ public class UndirectedGraphMatrix implements Graph {
 	@Override
 	public List<Integer> getNeighbors(int v) {
 		List<Integer> l = new ArrayList<>();
-		if (!checkBounds(v))
+		if (v < 0 || v >= matrix.length)
 			return l;
 		//get all neighbors in the column of v
 		for ( int i=0; i<matrix[v].length; i++) {
@@ -104,17 +104,17 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public double getEdgeWeight(int start, int end) {
-		if (!checkBounds(start) || !checkBounds(end))
-			return 0;
+		if (checkNotInBounds(start, end))
+			return Double.POSITIVE_INFINITY;
 		if(start>end)
-			return matrix[start][end] == 0 ? Double.POSITIVE_INFINITY : matrix[start][end];
+			return matrix[start][end];
 		else
-			return matrix[end][start] == 0 ? Double.POSITIVE_INFINITY : matrix[end][start];
+			return matrix[end][start];
 	}
 
 	@Override
 	public boolean hasEdge(int start, int end) {
-		if (!checkBounds(start) || !checkBounds(end))
+		if (checkNotInBounds(start, end))
 			return false;
 		if(start>end)
 			return matrix[start][end] != Double.POSITIVE_INFINITY;
@@ -124,7 +124,7 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void removeEdge(int start, int end) {
-		if (!checkBounds(start) || !checkBounds(end))
+		if (checkNotInBounds(start, end))
 			return;
 		if(start>end)
 			matrix[start][end] = Double.POSITIVE_INFINITY;
@@ -160,9 +160,11 @@ public class UndirectedGraphMatrix implements Graph {
 		}
 	}
 
-	private boolean checkBounds(int v) {
+	private boolean checkNotInBounds(int start, int end) {
 		//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + v );
-		return matrix.length > v && v >= 0;
+		if (matrix.length <= start || start < 0)
+			return true;
+		return matrix[start].length <= end || end < 0;
 	}
 
 }
