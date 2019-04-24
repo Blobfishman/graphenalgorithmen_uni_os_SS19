@@ -57,6 +57,8 @@ public class DirectedGraphMatrix implements Graph {
 			}
 		}
 
+
+
 		return list;
 	}
 
@@ -64,8 +66,8 @@ public class DirectedGraphMatrix implements Graph {
 	public List<Integer> getPredecessors(int v) {
 		List<Integer> l = new ArrayList<>();
 		if(checkBounds(v,v)){
-			for(int i = 0; i < mat.length;i++){
-				if(mat[i][v] != Double.POSITIVE_INFINITY ){
+			for(int i = 0; i <= v;i++){
+				if((mat[i][v] != Double.POSITIVE_INFINITY)  || (mat[v][i] != Double.POSITIVE_INFINITY)){
 					l.add(i);
 				}
 			}
@@ -77,8 +79,8 @@ public class DirectedGraphMatrix implements Graph {
 	public List<Integer> getSuccessors(int v) {
 		List<Integer> l = new ArrayList<>();
 		if(checkBounds(v,v)){
-			for(int i = 0; i < mat.length;i++){
-				if(mat[v][i] != Double.POSITIVE_INFINITY ){
+			for(int i = v; i < mat.length;i++){
+				if((mat[v][i] != Double.POSITIVE_INFINITY) || (mat[i][v] != Double.POSITIVE_INFINITY)) {
 					l.add(i);
 				}
 			}
