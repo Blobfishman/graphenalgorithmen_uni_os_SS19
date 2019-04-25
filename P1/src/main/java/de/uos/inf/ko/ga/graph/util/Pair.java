@@ -1,9 +1,9 @@
 package de.uos.inf.ko.ga.graph.util;
 
 /**
- * @author  Henrik Gerdes
- * @param <V1> Bounds two values in a pair
- * @param <V2> Bounds two values in a pair
+ * Represents a pair of values
+ * @param <V1> first value type
+ * @param <V2> 2nd value type
  */
 public class Pair<V1,V2> {
 

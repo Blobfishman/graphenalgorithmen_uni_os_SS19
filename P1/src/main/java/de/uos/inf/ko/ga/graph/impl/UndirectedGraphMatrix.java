@@ -7,12 +7,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implementation of a undirected graph with a matrix representation of the edges.
- * XXXXX
- * XXXX
- * XXX
- * XX
- * X
+ * Implementation of a undirected graph with a matrix representation of the edges. Allows negative, positive values and 0
+ * as edge weight.
+ * It minimize the required space by using arrays of different size which are referenced in the Main array(normal size).
+ * This makes it possible to work without a index function.
  */
 public class UndirectedGraphMatrix implements Graph {
 
@@ -42,10 +40,12 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void addVertex() {
+		//resize the sub arrays for the new Vertex by one and set the last index to "no edge" as default
 		for (int i=0; i<matrix.length; i++) {
 			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length+1);
 			matrix[i][matrix[i].length-1] = Double.POSITIVE_INFINITY;
 		}
+		//resize main array for the new Vertex by one and set the last array to a single element array with "no edge" as default value
 		matrix = Arrays.copyOf(matrix, matrix.length+1);
 		double[] a = {Double.POSITIVE_INFINITY};
 		matrix[matrix.length-1] = a;
@@ -134,7 +134,9 @@ public class UndirectedGraphMatrix implements Graph {
 
 	@Override
 	public void removeVertex() {
+		//resize main array (-1)
 		matrix = Arrays.copyOf(matrix, matrix.length-1);
+		//resize all sub arrays by -1 so that the last index/element is removed
 		for (int i=0; i<matrix.length; i++) {
 			matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length-1);
 		}
@@ -160,8 +162,18 @@ public class UndirectedGraphMatrix implements Graph {
 		}
 	}
 
+	/**
+	 * checks if the array is in bounds but keeps in mind that their are arrays of different size.
+	 * @param start index
+	 * @param end index
+	 * @return true if start and end are not in bounds of the array
+	 */
 	private boolean checkNotInBounds(int start, int end) {
-		//			throw new NoVertexExcept("Es gibt keinen Vertex mit:" + v );
+		if(start<=end) {
+			int buffer = start;
+			start = end;
+			end = buffer;
+		}
 		if (matrix.length <= start || start < 0)
 			return true;
 		return matrix[start].length <= end || end < 0;

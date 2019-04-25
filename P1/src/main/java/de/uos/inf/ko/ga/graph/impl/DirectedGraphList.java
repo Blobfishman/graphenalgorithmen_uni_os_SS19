@@ -137,7 +137,6 @@ public class DirectedGraphList implements Graph {
 		if(start > lists.size() || end > lists.size())
 		{
 			System.err.println("Es gibt keinen Vertex mit:" + start +" oder " + end);
-			//throw new NoVertexExcept("Es gibt keinen Vertex mit:" + start +" oder " + end);
 			return false;
 		}
 		return true;
