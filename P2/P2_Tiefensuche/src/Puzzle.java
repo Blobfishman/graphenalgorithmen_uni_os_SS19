@@ -1,32 +1,40 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Stack;
 
 public class Puzzle {
 
     Stack<int[][]> stack = new Stack<>();
+    Stack<int[][]> stackOut = new Stack<>();
+    int lastPop[][] = new int[3][3];
 
     public boolean dfs_beschraenkt(int puzzle[][],  int q){
         int i [][];
         int j [][];
-        stack.push(null);
+        int defaultPuzzle[][] = new int[3][3];
+        stack.push(defaultPuzzle);
+        printPuzzle(puzzle);
         //Lösung des Puzzles
         int puzzleLoesung [][] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0} };
-        if( puzzle.equals(puzzleLoesung)) { printPuzzle(puzzle); return true;};
-        stack.push(puzzle.clone());
+        if( equalsPuzzle(puzzle,puzzleLoesung)) { printPuzzle(puzzle); return true;}
+        stack.push(puzzle);
         do{
             i = stack.peek();
             j = nextNeighbor(i);
             if (j != null){
-                if( j.equals(puzzleLoesung)) {printPuzzle(j); return true;};
-                if (stack.search(j) == -1 && stack.search(null) < q){
+                if( equalsPuzzle(j,puzzleLoesung)) {printPuzzle(j); return true;}
+                if (!searchPuzzle(stack,j) && stack.search(defaultPuzzle) < q+1){
                     stack.push(j);
+                }else{
+                    lastPop = stack.pop();
+                    stackOut.push(lastPop);
                 }
+            }else {
+                lastPop = stack.pop();
+                stackOut.push(lastPop);
             }
-            else {
-                stack.pop();
-            }
-        }while(stack.peek() == null);
+        }while(!equalsPuzzle(stack.peek(),defaultPuzzle));
         return false;
     }
 
@@ -34,8 +42,8 @@ public class Puzzle {
         int x = 0;
         int y = 0;
         int tmp = 0;
-        int refPuzzle[][] = tmppuzzle.clone();
-        int puzzle[][] = tmppuzzle.clone();
+        int refPuzzle[][] = clonePuzzle(tmppuzzle);
+        int puzzle[][] = clonePuzzle(tmppuzzle);
 
         for (int i = 0; i < 3; ++i){
             for (int j = 0; j < 3;++j){
@@ -45,24 +53,23 @@ public class Puzzle {
 
         if(x+1 < 3){
             puzzle = switchNumbers(puzzle, x,y,x+1,y);
-            System.out.println(stack.search(puzzle));
-            if(stack.search(puzzle) == -1){return puzzle;}
-            puzzle = refPuzzle.clone();
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            puzzle = clonePuzzle(refPuzzle);
         }
         if (x-1 >= 0){
             puzzle = switchNumbers(puzzle, x,y,x-1,y);
-            if(stack.search(puzzle) == -1){return puzzle;}
-            puzzle = refPuzzle.clone();
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            puzzle = clonePuzzle(refPuzzle);
         }
         if (y+1 < 3){
             puzzle = switchNumbers(puzzle, x,y,x,y+1);
-            if(stack.search(puzzle) == -1){return puzzle;}
-            puzzle = refPuzzle.clone();
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            puzzle = clonePuzzle(refPuzzle);
         }
         if (y-1 >= 0){
             puzzle = switchNumbers(puzzle, x,y,x,y-1);
-            if(stack.search(puzzle) == -1){return puzzle;}
-            puzzle = refPuzzle.clone();
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            puzzle = clonePuzzle(refPuzzle);
         }
         return null;
     }
@@ -89,6 +96,37 @@ public class Puzzle {
             }
         }
         return puzzle;
+    }
+
+    public int[][] clonePuzzle(int tmp[][]){
+        int puzzle[][] = new int[3][3];
+        for (int i = 0; i < 3;++i){
+            for (int j = 0; j < 3;++j){
+                puzzle[i][j] = tmp[i][j];
+            }
+        }
+        return puzzle;
+    }
+
+    public boolean equalsPuzzle(int puzzle1[][], int puzzle2[][]){
+        for (int i = 0; i < 3;++i){
+            for (int j = 0; j < 3;++j){
+                if(puzzle1[i][j] != puzzle2[i][j]){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean searchPuzzle(Stack<int[][]> stack,int puzzle[][]){
+        Iterator it = stack.iterator();
+        while (it.hasNext()){
+            if(equalsPuzzle((int[][]) it.next(),puzzle)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void printPuzzle(int puzzle[][]) {
