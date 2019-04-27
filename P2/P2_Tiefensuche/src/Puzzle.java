@@ -23,7 +23,7 @@ public class Puzzle {
             i = stack.peek();
             j = nextNeighbor(i);
             if (j != null){
-                if( equalsPuzzle(j,puzzleLoesung)) {printPuzzle(j); return true;}
+                if( equalsPuzzle(j,puzzleLoesung)) {stack.push(j); return true;}
                 if (!searchPuzzle(stack,j) && stack.search(defaultPuzzle) < q+1){
                     stack.push(j);
                 }else{
@@ -38,7 +38,7 @@ public class Puzzle {
         return false;
     }
 
-    public int[][] nextNeighbor(int tmppuzzle[][]){
+    private int[][] nextNeighbor(int tmppuzzle[][]){
         int x = 0;
         int y = 0;
         int tmp = 0;
@@ -52,34 +52,32 @@ public class Puzzle {
         }
 
         if(x+1 < 3){
-            puzzle = switchNumbers(puzzle, x,y,x+1,y);
-            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            switchNumbers(puzzle, x,y,x+1,y);
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){return puzzle;}
             puzzle = clonePuzzle(refPuzzle);
         }
         if (x-1 >= 0){
-            puzzle = switchNumbers(puzzle, x,y,x-1,y);
-            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            switchNumbers(puzzle, x,y,x-1,y);
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){return puzzle;}
             puzzle = clonePuzzle(refPuzzle);
         }
         if (y+1 < 3){
-            puzzle = switchNumbers(puzzle, x,y,x,y+1);
-            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
+            switchNumbers(puzzle, x,y,x,y+1);
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){return puzzle;}
             puzzle = clonePuzzle(refPuzzle);
         }
         if (y-1 >= 0){
-            puzzle = switchNumbers(puzzle, x,y,x,y-1);
-            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){printPuzzle(puzzle);return puzzle;}
-            puzzle = clonePuzzle(refPuzzle);
+            switchNumbers(puzzle, x,y,x,y-1);
+            if(!searchPuzzle(stack,puzzle) && !searchPuzzle(stackOut,puzzle)){return puzzle;}
         }
         return null;
     }
 
-    public int[][] switchNumbers(int puzzle[][], int x1, int y1, int x2, int y2){
+    private void switchNumbers(int puzzle[][], int x1, int y1, int x2, int y2){
         int tmp = 0;
         tmp = puzzle[x2][y2];
         puzzle[x1][y1] = tmp;
         puzzle[x2][y2] = 0;
-        return puzzle;
     }
 
     public int[][] randomPuzzle(){
@@ -98,7 +96,7 @@ public class Puzzle {
         return puzzle;
     }
 
-    public int[][] clonePuzzle(int tmp[][]){
+    private int[][] clonePuzzle(int tmp[][]){
         int puzzle[][] = new int[3][3];
         for (int i = 0; i < 3;++i){
             for (int j = 0; j < 3;++j){
@@ -108,7 +106,7 @@ public class Puzzle {
         return puzzle;
     }
 
-    public boolean equalsPuzzle(int puzzle1[][], int puzzle2[][]){
+    private boolean equalsPuzzle(int puzzle1[][], int puzzle2[][]){
         for (int i = 0; i < 3;++i){
             for (int j = 0; j < 3;++j){
                 if(puzzle1[i][j] != puzzle2[i][j]){
@@ -136,5 +134,12 @@ public class Puzzle {
         }
         System.out.println("##################################");
 
+    }
+
+    public void printStack(){
+        Iterator it = stack.iterator();
+        while (it.hasNext()){
+            printPuzzle((int[][]) it.next());
+        }
     }
 }
