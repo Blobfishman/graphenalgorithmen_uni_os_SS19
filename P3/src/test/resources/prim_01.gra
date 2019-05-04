@@ -1,0 +1,9 @@
+# Number of nodes:
+n 6
+# Adjacency matrix including weights:
+   0 : x 4 2 x x x 
+   1 : 4 x 5 9 6 x
+   2 : 2 5 x 8 x 7 
+   3 : x 9 8 x 3 10 
+   4 : x 6 x 3 x 9 
+   5 : x x 7 10 9 x 

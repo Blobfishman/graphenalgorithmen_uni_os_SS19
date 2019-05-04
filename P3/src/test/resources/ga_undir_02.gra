@@ -1,0 +1,11 @@
+# Number of Nodes:
+n 8
+# Adjacency matrix:
+   0 : x x 1 x x 1 x 1
+   1 : x x x x 1 x x x 
+   2 : 1 x x 1 x x x x
+   3 : x x 1 x x 1 1 x
+   4 : x 1 x x x 1 1 x
+   5 : 1 x x 1 1 x x x
+   6 : x x x 1 1 x x x
+   7 : 1 x x x x x x x
