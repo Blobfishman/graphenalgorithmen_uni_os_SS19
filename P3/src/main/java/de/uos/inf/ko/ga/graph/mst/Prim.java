@@ -20,26 +20,43 @@ public class Prim {
 		assert(!graph.isDirected());
 
 		final Graph mst = new UndirectedGraphList();
+
+		//Set for the vertices, which are not added yet
 		HashSet<Integer> Vertices = new HashSet<Integer>();
+
+		//fill the Set with the Vertices from our graph
 		for (int i = 0; i < graph.getVertexCount(); i++)
 		{
 			Vertices.add(i);
 		}
+
+		//Set for our Vertices already in the graph
 		Set<Integer> InGraph = new HashSet<>();
-		mst.addVertices(graph.getVertexCount());  //Fügt alle Knoten des Graphen in Spannbaum ein
+
+		//Add all Vertices from our old Graph to the new one
+		mst.addVertices(graph.getVertexCount());
+
+		//Some Variables
 		int start;
 		int end;
 		double weight;
 
+		//deletes isolated Vertices from our Set
 		Vertices = deIsolateSet(Vertices,graph);
 
-		InGraph.add(0);
-		Vertices.remove(0);
+		//adds the first Element from our Vertice into our Graph Set
+		//(because the Element 0 could be isolated)
+		for(Integer m : Vertices)
+		{
+			InGraph.add(m);
+			Vertices.remove(m);
+			break;
+		}
 
 		while (Vertices.size() != 0) {
-			start = 1000;
-			end = 1000;
-			weight = 1000;
+			start = 100000;
+			end = 100000;
+			weight = 100000;
 			for (Integer j : InGraph)
 			{
 				for (Integer k : Vertices)
@@ -148,7 +165,6 @@ public class Prim {
 			// Function to heapify the node at pos
 			private void minHeapify(int pos)
 			{
-
 				// If the node is a non-leaf node and greater
 				// than any of its child
 				if (!isLeaf(pos)) {
@@ -221,7 +237,7 @@ public class Prim {
 
 		InGraph.add(0);
 		Vertices.remove(0);
-		
+
 
 
 
