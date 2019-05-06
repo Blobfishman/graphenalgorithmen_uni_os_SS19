@@ -20,38 +20,73 @@ public class Prim {
 		assert(!graph.isDirected());
 
 		final Graph mst = new UndirectedGraphList();
-		Set<Integer> Vertices = new HashSet<Integer>();
-		mst.addVertices(graph.getVertexCount());  //Fügt alle Knoten des Graphen in Spannbaum ein
-		int vertex = 0;       //Nummer des aktuellen Knotens
-		int neighbor = 0;     //Nummer des Nachbarn
-		int next = 0;         //Nummer des nächsten Knotens der eingefügt wird
-
-		while (Vertices.size() < graph.getVertexCount())
+		HashSet<Integer> Vertices = new HashSet<Integer>();
+		for (int i = 0; i < graph.getVertexCount(); i++)
 		{
-			Vertices.add(vertex);
-			List<Integer> neighbors = graph.getNeighbors(vertex);
-			Iterator iterator = neighbors.iterator();
-			double j = 100000;
+			Vertices.add(i);
+		}
+		Set<Integer> InGraph = new HashSet<>();
+		mst.addVertices(graph.getVertexCount());  //Fügt alle Knoten des Graphen in Spannbaum ein
+		int start;
+		int end;
+		double weight;
 
-			while(iterator.hasNext())
+		Vertices = deIsolateSet(Vertices,graph);
+
+		InGraph.add(0);
+		Vertices.remove(0);
+
+		while (Vertices.size() != 0) {
+			start = 1000;
+			end = 1000;
+			weight = 1000;
+			for (Integer j : InGraph)
 			{
-				neighbor = (int) iterator.next();
-				if(!Vertices.contains(neighbor))
+				for (Integer k : Vertices)
 				{
-					if (graph.getEdgeWeight(vertex,neighbor) < j)
+					if (graph.hasEdge(j, k))
 					{
-						j = graph.getEdgeWeight(vertex,neighbor);
-						next = neighbor;
+						if (graph.getEdgeWeight(j, k) < weight)
+						{
+							start = j;
+							end = k;
+							weight = graph.getEdgeWeight(j, k);
+						}
 					}
 				}
 			}
 
-			mst.addEdge(vertex,next,j);
-			vertex = next;
-
+			mst.addEdge(start, end, weight);
+			InGraph.add(end);
+			Vertices.remove(end);
 		}
 
 		return mst;
+	}
+
+	public static HashSet<Integer> deIsolateSet (HashSet<Integer> Vertices, Graph graph)
+	{
+		boolean isolated;
+		for(int o = 0; o < Vertices.size(); o++)
+		{
+			isolated = true;
+
+			for(int i = 0; i < graph.getVertexCount(); i++)
+			{
+				if ((graph.hasEdge(o,i)) || (graph.hasEdge(i,o)))
+				{
+					isolated = false;
+				}
+			}
+
+			if (isolated == true)
+			{
+				Vertices.remove(o);
+			}
+
+		}
+
+		return Vertices;
 	}
 
 	/**
