@@ -179,13 +179,7 @@ public class Prim {
 				// than any of its child
 				if (!isLeaf(pos))
 				{
-					if (Heap[rightChild(pos)] == null)
-					{
-						swap(pos, leftChild(pos));
-					}
 
-					else
-					{
 						if (Heap[pos].weight > Heap[leftChild(pos)].weight
 								|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
 
@@ -205,7 +199,7 @@ public class Prim {
 						}
 					}
 				}
-			}
+
 
 			// Function to insert a node into the heap
 			public void insert(node element)
@@ -235,13 +229,8 @@ public class Prim {
 			public node remove()
 			{
 				node popped = Heap[FRONT];
-				int a = 1;
-				while(Heap[a] != null)
-				{
-					a++;
-				}
 
-				Heap[FRONT] = Heap[--a];
+				Heap[FRONT] = Heap[size];
 				minHeapify(FRONT);
 				return popped;
 			}
@@ -249,6 +238,11 @@ public class Prim {
 
 		//create a heap for the graph
 		MinHeap heap = new MinHeap(graph.getVertexCount() +1 );
+		node maxEdge = new node(10000,100001,10000);
+		for(int g = 0; g < graph.getVertexCount() +1; g++)
+		{
+			heap.Heap[g] = maxEdge;
+		}
 		//flag for the nodes
 		boolean alreadyIn = false;
 		//a generatetd node for our edges
@@ -256,6 +250,8 @@ public class Prim {
 		node nextEdge;
 		//startpoint in our heap
 		int y = 1;
+
+		boolean first = true;
 
 		//our Set with Vertices that are not included yet
 		HashSet<Integer> Vertices = new HashSet<Integer>();
@@ -277,8 +273,6 @@ public class Prim {
 			break;
 		}
 
-		boolean first = true;
-
 		while(Vertices.size() != 0)
 		{
 			for(Integer i: InGraph)
@@ -297,6 +291,7 @@ public class Prim {
 
 						else
 						{
+							alreadyIn = false;
 							//es wird eine Kante mit Start, Ende und dem Gewicht erzeugt
 							edge = new node(i,j,graph.getEdgeWeight(i,j));
 							System.out.println("Ich bin nicht mehr im Anfangsknoten.");
@@ -316,7 +311,7 @@ public class Prim {
 										if (heap.Heap[m].weight > edge.weight)
 										{
 											System.out.println("Die Kante wurde verbessert");
-											//Sollte sie kleiner sein so wird diese ersestzt und der Baum neu sortiert
+											//Sollte sie kleiner sein so wird diese ersetzt und der Baum neu sortiert
 											heap.Heap[m] = edge;
 											heap.minHeap();
 										}
@@ -328,7 +323,6 @@ public class Prim {
 							{
 								System.out.println("Ich füge Kanten hinzu");
 								heap.insert(edge);
-								alreadyIn = true;
 							}
 						}
 					}
