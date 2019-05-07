@@ -4,8 +4,6 @@ import de.uos.inf.ko.ga.graph.Graph;
 import de.uos.inf.ko.ga.graph.impl.UndirectedGraphList;
 
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 public class Prim {
@@ -37,15 +35,15 @@ public class Prim {
 		mst.addVertices(graph.getVertexCount());
 
 		//Some Variables
-		int start;
-		int end;
-		double weight;
+		int start = 100000;
+		int end = 100000;
+		double weight = 100000;
 
 		//deletes isolated Vertices from our Set
 		Vertices = deIsolateSet(Vertices,graph);
 
 		//adds the first Element from our Vertice into our Graph Set
-		//(because the Element 0 could be isolated)
+		//(because the Element 0 could be isolated we search for the )
 		for(Integer m : Vertices)
 		{
 			InGraph.add(m);
@@ -53,10 +51,8 @@ public class Prim {
 			break;
 		}
 
-		while (Vertices.size() != 0) {
-			start = 100000;
-			end = 100000;
-			weight = 100000;
+		while (Vertices.size() != 0)
+		{
 			for (Integer j : InGraph)
 			{
 				for (Integer k : Vertices)
@@ -73,9 +69,17 @@ public class Prim {
 				}
 			}
 
-			mst.addEdge(start, end, weight);
-			InGraph.add(end);
-			Vertices.remove(end);
+			if((start < 100000) && (end < 1000000) && (weight < 100000) )
+			{
+				mst.addEdge(start, end, weight);
+				InGraph.add(end);
+				Vertices.remove(end);
+			}
+
+			start = 100000;
+			end = 100000;
+			weight = 100000;
+
 		}
 
 		return mst;
@@ -94,6 +98,10 @@ public class Prim {
 
 		final Graph mst = new UndirectedGraphList();
 
+		/**
+		 * A small class for our nodes, which are going into our three.
+		 */
+
 		class node {
 
 			int start;
@@ -108,6 +116,9 @@ public class Prim {
 			}
 		}
 
+		/**
+		 * A small class for our heap
+		 */
 
 		class MinHeap {
 			private node[] Heap;
@@ -163,26 +174,34 @@ public class Prim {
 			}
 
 			// Function to heapify the node at pos
-			private void minHeapify(int pos)
-			{
+			private void minHeapify(int pos) {
 				// If the node is a non-leaf node and greater
 				// than any of its child
-				if (!isLeaf(pos)) {
-					if (Heap[pos].weight > Heap[leftChild(pos)].weight
-							|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
+				if (!isLeaf(pos))
+				{
+					if (Heap[rightChild(pos)] == null)
+					{
+						swap(pos, leftChild(pos));
+					}
 
-						// Swap with the left child and heapify
-						// the left child
-						if (Heap[leftChild(pos)].weight < Heap[rightChild(pos)].weight) {
-							swap(pos, leftChild(pos));
-							minHeapify(leftChild(pos));
-						}
+					else
+					{
+						if (Heap[pos].weight > Heap[leftChild(pos)].weight
+								|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
 
-						// Swap with the right child and heapify
-						// the right child
-						else {
-							swap(pos, rightChild(pos));
-							minHeapify(rightChild(pos));
+							// Swap with the left child and heapify
+							// the left child
+							if (Heap[leftChild(pos)].weight < Heap[rightChild(pos)].weight) {
+								swap(pos, leftChild(pos));
+								minHeapify(leftChild(pos));
+							}
+
+							// Swap with the right child and heapify
+							// the right child
+							else {
+								swap(pos, rightChild(pos));
+								minHeapify(rightChild(pos));
+							}
 						}
 					}
 				}
@@ -216,33 +235,117 @@ public class Prim {
 			public node remove()
 			{
 				node popped = Heap[FRONT];
-				Heap[FRONT] = Heap[size--];
+				int a = 1;
+				while(Heap[a] != null)
+				{
+					a++;
+				}
+
+				Heap[FRONT] = Heap[--a];
 				minHeapify(FRONT);
 				return popped;
 			}
 		}
 
+		//create a heap for the graph
+		MinHeap heap = new MinHeap(graph.getVertexCount() +1 );
+		//flag for the nodes
+		boolean alreadyIn = false;
+		//a generatetd node for our edges
+		node edge;
+		node nextEdge;
+		//startpoint in our heap
+		int y = 1;
+
+		//our Set with Vertices that are not included yet
 		HashSet<Integer> Vertices = new HashSet<Integer>();
+
 		for (int i = 0; i < graph.getVertexCount(); i++)
 		{
 			Vertices.add(i);
 		}
+
 		Set<Integer> InGraph = new HashSet<>();
 		mst.addVertices(graph.getVertexCount());  //Fügt alle Knoten des Graphen in Spannbaum ein
-		int start;
-		int end;
-		double weight;
 
 		Vertices = deIsolateSet(Vertices,graph);
 
-		InGraph.add(0);
-		Vertices.remove(0);
+		for(Integer m : Vertices)
+		{
+			InGraph.add(m);
+			Vertices.remove(m);
+			break;
+		}
 
+		boolean first = true;
 
+		while(Vertices.size() != 0)
+		{
+			for(Integer i: InGraph)
+			{
+				for(Integer j: Vertices)
+				{
+					if(graph.hasEdge(i,j))
+					{
+						//alle Kanten des ersten Elementes werden direkt in den Heap eingefügt
+						if(first == true)
+						{
+							heap.Heap[y] = (new node(i,j,graph.getEdgeWeight(i,j)));
+							System.out.println("Ich füge die 1. Kanten hinzu");
+							y++;
+						}
 
+						else
+						{
+							//es wird eine Kante mit Start, Ende und dem Gewicht erzeugt
+							edge = new node(i,j,graph.getEdgeWeight(i,j));
+							System.out.println("Ich bin nicht mehr im Anfangsknoten.");
 
+							//es wird geprüft ob sich eine Kante zum Knoten schon im Heap befindet
+							for(int m = 1; m < graph.getVertexCount() ; m++)
+							{
+								if (heap.Heap[m] != null)
+								{
+									if (heap.Heap[m].end == edge.end)
+									{
+										System.out.println("Es wurde bereits eine Kante gefunden");
+										// Wenn ja so wird ein boolean auf true gesetzt
+										// und es wird geprüft ob diese kleiner ist
+										alreadyIn = true;
 
-		/* TODO: implement Prim's algorithm */
+										if (heap.Heap[m].weight > edge.weight)
+										{
+											System.out.println("Die Kante wurde verbessert");
+											//Sollte sie kleiner sein so wird diese ersestzt und der Baum neu sortiert
+											heap.Heap[m] = edge;
+											heap.minHeap();
+										}
+									}
+								}
+							}
+							//Sollte sich die Kante noch nicht im Heap befinden, so wird diese einfach eingefügt
+							if (alreadyIn == false)
+							{
+								System.out.println("Ich füge Kanten hinzu");
+								heap.insert(edge);
+								alreadyIn = true;
+							}
+						}
+					}
+
+				}
+				first = false;
+			}
+
+			//Nachdem nun alle Kanten eingefügt werden, wird das erste Element gelöscht und in unseren Graphen eingefügt
+			nextEdge = heap.remove();
+			System.out.println("Ich lösche das erste Element im Heap");
+			mst.addEdge(nextEdge.start,nextEdge.end,nextEdge.weight);
+			InGraph.add(nextEdge.end);
+			Vertices.remove(nextEdge.end);
+			System.out.println("Ich lösche das erste ELement aus meinen Vertices " + nextEdge.end);
+		}
+
 
 		return mst;
 	}
@@ -257,7 +360,7 @@ public class Prim {
 	public static HashSet<Integer> deIsolateSet (HashSet<Integer> Vertices, Graph graph)
 	{
 		boolean isolated;
-		for(int o = 0; o < Vertices.size(); o++)
+		for(int o = 0; o < Vertices.size() - 1; o++)
 		{
 			isolated = true;
 
