@@ -44,7 +44,7 @@ public class Prim {
 		//deletes isolated Vertices from our Set
 		deIsolateSet(Vertices,graph);
 
-		//adds the first Element from our Vertice into our Graph Set
+		//adds the first Element from our Vertices into our Graph Set
 		//(because the Element 0 could be isolated we search for the )
 		for(Integer m : Vertices)
 		{
@@ -77,6 +77,20 @@ public class Prim {
 				mst.addEdge(start, end, weight);
 				InGraph.add(end);
 				Vertices.remove(end);
+			}
+
+			// if the graph is not related, we add a node from the other connected component
+			else
+			{
+				for (Integer z: Vertices)
+				{
+					if(Vertices.contains(z))
+					{
+						InGraph.add(z);
+						Vertices.remove(z);
+					}
+					break;
+				}
 			}
 
 			start = 100000;
@@ -177,7 +191,7 @@ public class Prim {
 	}
 
 	/**
-	 * Deletes all the isolated Vertices from our Set, so there wont be any problems
+	 * Deletes all the isolated Vertices from our Set, to prevent unpredictable behaviour
 	 * @param Vertices a Set with all the vertices
 	 * @param graph input graph
 	 */
