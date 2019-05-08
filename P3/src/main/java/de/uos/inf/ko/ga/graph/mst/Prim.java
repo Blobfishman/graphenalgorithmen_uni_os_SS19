@@ -120,15 +120,20 @@ public class Prim {
 		 * A small class for our heap
 		 */
 
-		class MinHeap {
+		 class MinHeap {
 			private node[] Heap;
 			private int size;
+			private int maxsize;
+			private node begin = new node(Integer.MIN_VALUE,Integer.MIN_VALUE,Double.MIN_VALUE);
 
 			private static final int FRONT = 1;
 
-			public MinHeap(int size)
+			public MinHeap(int maxsize)
 			{
-				Heap = new node[size];
+				this.maxsize = maxsize;
+				this.size = 0;
+				Heap = new node[this.maxsize + 1];
+				Heap[0] = begin;
 			}
 
 			// Function to return the position of
@@ -174,36 +179,38 @@ public class Prim {
 			}
 
 			// Function to heapify the node at pos
-			private void minHeapify(int pos) {
+			private void minHeapify(int pos)
+			{
+
 				// If the node is a non-leaf node and greater
 				// than any of its child
-				if (!isLeaf(pos))
-				{
+				if (!isLeaf(pos)) {
+					if (Heap[pos].weight > Heap[leftChild(pos)].weight
+							|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
 
-						if (Heap[pos].weight > Heap[leftChild(pos)].weight
-								|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
+						// Swap with the left child and heapify
+						// the left child
+						if (Heap[leftChild(pos)].weight < Heap[rightChild(pos)].weight) {
+							swap(pos, leftChild(pos));
+							minHeapify(leftChild(pos));
+						}
 
-							// Swap with the left child and heapify
-							// the left child
-							if (Heap[leftChild(pos)].weight < Heap[rightChild(pos)].weight) {
-								swap(pos, leftChild(pos));
-								minHeapify(leftChild(pos));
-							}
-
-							// Swap with the right child and heapify
-							// the right child
-							else {
-								swap(pos, rightChild(pos));
-								minHeapify(rightChild(pos));
-							}
+						// Swap with the right child and heapify
+						// the right child
+						else {
+							swap(pos, rightChild(pos));
+							minHeapify(rightChild(pos));
 						}
 					}
 				}
-
+			}
 
 			// Function to insert a node into the heap
 			public void insert(node element)
 			{
+				if (size >= maxsize) {
+					return;
+				}
 				Heap[++size] = element;
 				int current = size;
 
@@ -212,7 +219,6 @@ public class Prim {
 					current = parent(current);
 				}
 			}
-
 
 
 			// Function to build the min heap using
@@ -233,21 +239,27 @@ public class Prim {
 				minHeapify(FRONT);
 				return popped;
 			}
+
+
 		}
 
+
 		//create a heap for the graph
-		MinHeap heap = new MinHeap(graph.getVertexCount() +1 );
+		MinHeap heap = new MinHeap(graph.getVertexCount());
+
+		//fill the heap with big edges, so we are not going to have NullpointerExceptions
 		node maxEdge = new node(100000,100000,100000);
 		for(int g = 0; g < graph.getVertexCount() +1; g++)
 		{
 			heap.Heap[g] = maxEdge;
 		}
+
 		//flag for the nodes
 		boolean alreadyIn = false;
-		//a generatetd node for our edges
+
+		//a generatetd node for our edges and the next edge which is going into our graph
 		node edge;
 		node nextEdge;
-		//startpoint in our heap
 
 		//our Set with Vertices that are not included yet
 		HashSet<Integer> Vertices = new HashSet<Integer>();
@@ -280,7 +292,6 @@ public class Prim {
 							alreadyIn = false;
 							//es wird eine Kante mit Start, Ende und dem Gewicht erzeugt
 							edge = new node(i,j,graph.getEdgeWeight(i,j));
-							System.out.println("Ich bin nicht mehr im Anfangsknoten.");
 
 							//es wird geprüft ob sich eine Kante zum Knoten schon im Heap befindet
 							for(int m = 1; m < graph.getVertexCount() ; m++)
@@ -297,7 +308,7 @@ public class Prim {
 										{
 											//Sollte sie kleiner sein so wird diese ersetzt und der Baum neu sortiert
 											heap.Heap[m] = edge;
-											heap.minHeap();
+											heap.minHeapify(1);
 										}
 									}
 								}
@@ -322,7 +333,6 @@ public class Prim {
 			}
 		}
 
-
 		return mst;
 	}
 
@@ -336,7 +346,7 @@ public class Prim {
 	public static HashSet<Integer> deIsolateSet (HashSet<Integer> Vertices, Graph graph)
 	{
 		boolean isolated;
-		for(int o = 0; o < Vertices.size(); o++)
+		for(int o = 0; o < Vertices.size() + 1; o++)
 		{
 			isolated = true;
 
