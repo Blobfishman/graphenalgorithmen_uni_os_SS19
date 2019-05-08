@@ -249,9 +249,6 @@ public class Prim {
 		node edge;
 		node nextEdge;
 		//startpoint in our heap
-		int y = 1;
-
-		boolean first = true;
 
 		//our Set with Vertices that are not included yet
 		HashSet<Integer> Vertices = new HashSet<Integer>();
@@ -281,16 +278,6 @@ public class Prim {
 				{
 					if(graph.hasEdge(i,j))
 					{
-						//alle Kanten des ersten Elementes werden direkt in den Heap eingefügt
-						if(first == true)
-						{
-							heap.Heap[y] = (new node(i,j,graph.getEdgeWeight(i,j)));
-							System.out.println("Ich füge die 1. Kanten hinzu");
-							y++;
-						}
-
-						else
-						{
 							alreadyIn = false;
 							//es wird eine Kante mit Start, Ende und dem Gewicht erzeugt
 							edge = new node(i,j,graph.getEdgeWeight(i,j));
@@ -328,8 +315,6 @@ public class Prim {
 					}
 
 				}
-				first = false;
-			}
 
 			//Nachdem nun alle Kanten eingefügt werden, wird das erste Element gelöscht und in unseren Graphen eingefügt
 			nextEdge = heap.remove();
