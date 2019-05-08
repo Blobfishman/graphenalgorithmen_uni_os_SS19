@@ -4,6 +4,8 @@ import de.uos.inf.ko.ga.graph.Graph;
 import de.uos.inf.ko.ga.graph.impl.UndirectedGraphList;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 public class Prim {
@@ -20,7 +22,7 @@ public class Prim {
 		final Graph mst = new UndirectedGraphList();
 
 		//Set for the vertices, which are not added yet
-		HashSet<Integer> Vertices = new HashSet<Integer>();
+		HashSet<Integer> Vertices = new HashSet<>();
 
 		//fill the Set with the Vertices from our graph
 		for (int i = 0; i < graph.getVertexCount(); i++)
@@ -40,7 +42,7 @@ public class Prim {
 		double weight = 100000;
 
 		//deletes isolated Vertices from our Set
-		Vertices = deIsolateSet(Vertices,graph);
+		deIsolateSet(Vertices,graph);
 
 		//adds the first Element from our Vertice into our Graph Set
 		//(because the Element 0 could be isolated we search for the )
@@ -50,6 +52,7 @@ public class Prim {
 			Vertices.remove(m);
 			break;
 		}
+
 
 		while (Vertices.size() != 0)
 		{
@@ -93,245 +96,82 @@ public class Prim {
 	 * @return Minimum spanning tree of the input graph
 	 */
 	public static Graph minimumSpanningTreeHeap(Graph graph) {
-		assert(graph != null);
-		assert(!graph.isDirected());
+		assert (graph != null);
+		assert (!graph.isDirected());
 
 		final Graph mst = new UndirectedGraphList();
 
-		/**
-		 * A small class for our nodes, which are going into our three.
-		 */
+		mst.addVertices(graph.getVertexCount());
 
-		class node {
+		HashSet<Integer> visited = new HashSet<>();
 
-			int start;
-			int end;
-			double weight;
+		PriorityQueue<Node> heap = new PriorityQueue<>();
 
-			public node(int x, int y, double z)
-			{
-				start = x;
-				end = y;
-				weight = z;
-			}
+		double[] d = new double[graph.getVertexCount()];
+		int[] pred = new int[graph.getVertexCount()];
+
+		for (int i=0; i<d.length; i++) {
+			d[i]= Double.MAX_VALUE;
 		}
 
-		/**
-		 * A small class for our heap
-		 */
+		//find first unisolated node to prevent unwanted behaviour
+		boolean notFound = true;
+		int startIndex = 0;
+		for (; startIndex<graph.getVertexCount() && notFound; startIndex++) {
+			notFound = graph.getNeighbors(startIndex).isEmpty();
+			visited.add(startIndex);
+		}
 
-		 class MinHeap {
-			private node[] Heap;
-			private int size;
-			private int maxsize;
-			private node begin = new node(Integer.MIN_VALUE,Integer.MIN_VALUE,Double.MIN_VALUE);
+		//add all neighbors of the start node to heap
+		List<Integer> l = graph.getNeighbors(startIndex);
+		for (int i : l) {
+			Node node = new Node(startIndex, i, graph.getEdgeWeight(startIndex, i));
+			heap.add(node);
+			d[i] = graph.getEdgeWeight(startIndex, i);
+			pred[i] = startIndex;
+		}
 
-			private static final int FRONT = 1;
+		//do prim
+		while (visited.size() != graph.getVertexCount()) {
+			//get node with minimal weight
+			Node node = heap.poll();
+			if (node != null) {
+				mst.addEdge(pred[node.end], node.end, node.weight);
+				visited.add(node.end);
 
-			public MinHeap(int maxsize)
-			{
-				this.maxsize = maxsize;
-				this.size = 0;
-				Heap = new node[this.maxsize + 1];
-				Heap[0] = begin;
-			}
-
-			// Function to return the position of
-			// the parent for the node currently
-			// at pos
-			private int parent(int pos)
-			{
-				return pos / 2;
-			}
-
-			// Function to return the position of the
-			// left child for the node currently at pos
-			private int leftChild(int pos)
-			{
-				return (2 * pos);
-			}
-
-			// Function to return the position of
-			// the right child for the node currently
-			// at pos
-			private int rightChild(int pos)
-			{
-				return (2 * pos) + 1;
-			}
-
-			// Function that returns true if the passed
-			// node is a leaf node
-			private boolean isLeaf(int pos)
-			{
-				if (pos >= (size / 2) && pos <= size) {
-					return true;
-				}
-				return false;
-			}
-
-			// Function to swap two nodes of the heap
-			private void swap(int fpos, int spos)
-			{
-				node tmp;
-				tmp = Heap[fpos];
-				Heap[fpos] = Heap[spos];
-				Heap[spos] = tmp;
-			}
-
-			// Function to heapify the node at pos
-			private void minHeapify(int pos)
-			{
-
-				// If the node is a non-leaf node and greater
-				// than any of its child
-				if (!isLeaf(pos)) {
-					if (Heap[pos].weight > Heap[leftChild(pos)].weight
-							|| Heap[pos].weight > Heap[rightChild(pos)].weight) {
-
-						// Swap with the left child and heapify
-						// the left child
-						if (Heap[leftChild(pos)].weight < Heap[rightChild(pos)].weight) {
-							swap(pos, leftChild(pos));
-							minHeapify(leftChild(pos));
-						}
-
-						// Swap with the right child and heapify
-						// the right child
-						else {
-							swap(pos, rightChild(pos));
-							minHeapify(rightChild(pos));
-						}
+				//go through neighbors and pick edge
+				List<Integer> neighbors = graph.getNeighbors(node.end);
+				for (int neighbor : neighbors) {
+					if(!visited.contains(neighbor) && graph.getEdgeWeight(node.end, neighbor) < d[neighbor]) {
+						d[neighbor] = graph.getEdgeWeight(node.end, neighbor);
+						pred[neighbor] = node.end;
+						Node newNode = new Node(node.end, neighbor, graph.getEdgeWeight(node.end, neighbor));
+						heap.add(newNode);
 					}
 				}
 			}
+			else{
+				//If no node exist find new startIndex
+				//find unisolated node to prevent infinite loop
 
-			// Function to insert a node into the heap
-			public void insert(node element)
-			{
-				if (size >= maxsize) {
-					return;
-				}
-				Heap[++size] = element;
-				int current = size;
-
-				while (Heap[current].weight < Heap[parent(current)].weight) {
-					swap(current, parent(current));
-					current = parent(current);
-				}
-			}
-
-
-			// Function to build the min heap using
-			// the minHeapify
-			public void minHeap()
-			{
-				for (int pos = (size / 2); pos >= 1; pos--) {
-					minHeapify(pos);
-				}
-			}
-
-			// Function to remove and return the minimum
-			// element from the heap
-			public node remove()
-			{
-				node popped = Heap[FRONT];
-				Heap[FRONT] = Heap[size--];
-				minHeapify(FRONT);
-				return popped;
-			}
-
-
-		}
-
-
-		//create a heap for the graph
-		MinHeap heap = new MinHeap(graph.getVertexCount());
-
-		//fill the heap with big edges, so we are not going to have NullpointerExceptions
-		node maxEdge = new node(100000,100000,100000);
-		for(int g = 0; g < graph.getVertexCount() +1; g++)
-		{
-			heap.Heap[g] = maxEdge;
-		}
-
-		//flag for the nodes
-		boolean alreadyIn = false;
-
-		//a generatetd node for our edges and the next edge which is going into our graph
-		node edge;
-		node nextEdge;
-
-		//our Set with Vertices that are not included yet
-		HashSet<Integer> Vertices = new HashSet<Integer>();
-
-		for (int i = 0; i < graph.getVertexCount(); i++)
-		{
-			Vertices.add(i);
-		}
-
-		Set<Integer> InGraph = new HashSet<>();
-		mst.addVertices(graph.getVertexCount());  //Fügt alle Knoten des Graphen in Spannbaum ein
-
-		Vertices = deIsolateSet(Vertices,graph);
-
-		for(Integer m : Vertices)
-		{
-			InGraph.add(m);
-			Vertices.remove(m);
-			break;
-		}
-
-		while(Vertices.size() != 0)
-		{
-			for(Integer i: InGraph)
-			{
-				for(Integer j: Vertices)
-				{
-					if(graph.hasEdge(i,j))
-					{
-							alreadyIn = false;
-							//es wird eine Kante mit Start, Ende und dem Gewicht erzeugt
-							edge = new node(i,j,graph.getEdgeWeight(i,j));
-
-							//es wird geprüft ob sich eine Kante zum Knoten schon im Heap befindet
-							for(int m = 1; m < graph.getVertexCount() ; m++)
-							{
-								if (heap.Heap[m] != null)
-								{
-									if (heap.Heap[m].end == edge.end)
-									{
-										// Wenn ja so wird ein boolean auf true gesetzt
-										// und es wird geprüft ob diese kleiner ist
-										alreadyIn = true;
-
-										if (heap.Heap[m].weight > edge.weight)
-										{
-											//Sollte sie kleiner sein so wird diese ersetzt und der Baum neu sortiert
-											heap.Heap[m] = edge;
-											heap.minHeapify(1);
-										}
-									}
-								}
-							}
-							//Sollte sich die Kante noch nicht im Heap befinden, so wird diese einfach eingefügt
-							if (alreadyIn == false)
-							{
-								heap.insert(edge);
-							}
-						}
+				notFound = true;
+				for (; startIndex<graph.getVertexCount() && notFound ; startIndex++) {
+					if (!visited.contains(startIndex)) {
+						notFound = graph.getNeighbors(startIndex).isEmpty();
+						visited.add(startIndex);
 					}
-
 				}
 
-			//Nachdem nun alle Kanten eingefügt werden, wird das erste Element gelöscht und in unseren Graphen eingefügt
-			nextEdge = heap.remove();
-			if ((nextEdge.end != 100000) && (nextEdge.start != 100000) && (nextEdge.weight != 100000))
-			{
-				mst.addEdge(nextEdge.start,nextEdge.end,nextEdge.weight);
-				InGraph.add(nextEdge.end);
-				Vertices.remove(nextEdge.end);
+
+				//add all neighbors of the new start node to heap
+				l = graph.getNeighbors(startIndex);
+				for (int i : l) {
+					Node n = new Node(startIndex, i, graph.getEdgeWeight(startIndex, i));
+					heap.add(n);
+				}
 			}
 		}
+
 
 		return mst;
 	}
@@ -340,31 +180,48 @@ public class Prim {
 	 * Deletes all the isolated Vertices from our Set, so there wont be any problems
 	 * @param Vertices a Set with all the vertices
 	 * @param graph input graph
-	 * @return Vertices, but only the non isolated ones
 	 */
 
-	public static HashSet<Integer> deIsolateSet (HashSet<Integer> Vertices, Graph graph)
+	private static void deIsolateSet(HashSet<Integer> Vertices, Graph graph)
 	{
 		boolean isolated;
-		for(int o = 0; o < Vertices.size() + 1; o++)
+		for(int k = 0; k < Vertices.size() + 1; k++)
 		{
 			isolated = true;
 
 			for(int i = 0; i < graph.getVertexCount(); i++)
 			{
-				if ((graph.hasEdge(o,i)) || (graph.hasEdge(i,o)))
+				if ((graph.hasEdge(k,i)) || (graph.hasEdge(i,k)))
 				{
 					isolated = false;
 				}
 			}
 
-			if (isolated == true)
+			if (isolated)
 			{
-				Vertices.remove(o);
+				Vertices.remove(k);
 			}
 
 		}
 
-		return Vertices;
+	}
+
+
+	private static class Node implements Comparable{
+
+		double weight;
+		int start;
+		int end;
+
+		Node(int start, int end, double edgeWeight) {
+			this.weight = edgeWeight;
+			this.start = start;
+			this.end = end;
+		}
+
+		@Override
+		public int compareTo(Object o) {
+			return Double.compare(weight, ((Node) o).weight);
+		}
 	}
 }
