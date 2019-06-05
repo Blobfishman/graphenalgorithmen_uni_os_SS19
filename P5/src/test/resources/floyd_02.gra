@@ -1,0 +1,10 @@
+# Generated on Mon Dec  3 20:09:29 2007
+# Number of Nodes:
+n 6
+# Adjacency matrix:
+   0 : x 8 x x x x 
+   1 : x x 4 3 x x 
+   2 : 3 x x x 5 9 
+   3 : 6 9 x x x x 
+   4 : x 8 8 x x x 
+   5 : 7 x x 9 x x 
