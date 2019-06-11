@@ -61,9 +61,9 @@ public class Tour {
 				knoten.add(i);
 			}
 
-			int[] random = new int[6];
+			int[] random = new int[g.getVertexCount()];
 
-			for (int j = 0; j < 6; j++)
+			for (int j = 0; j < g.getVertexCount(); j++)
 			{
 				int next = (int) (Math.random() * knoten.size());
 				random[j] = next;

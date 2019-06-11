@@ -116,7 +116,26 @@ public class TwoOpt {
 
 		}
 		else {
+			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
 
+				if (i <= 3) {
+					for (int x = 0; x <= i - 2; x++) {
+						new_tour = twoOptExchange(tour, x, i);
+						if (new_tour.getCosts() < best_tour.getCosts()) {
+							return new_tour;
+						}
+					}
+				}
+
+				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
+					new_tour = twoOptExchange(tour, i, x);
+					if(new_tour.getCosts() < best_tour.getCosts())
+					{
+						return new_tour;
+					}
+				}
+			}
+			return new_tour;
 		}
 
 
@@ -134,13 +153,26 @@ public class TwoOpt {
 	 */
 	public static Tour iterativeTwoOpt(Tour tour, boolean firstFit) {
 
-		if (!firstFit){
-			twoOptNeighborhood(tour, false);
+		if (!firstFit ){
+			while(twoOptNeighborhood(tour,false).getCosts() - tour.getCosts() != 0)
+			{
+				if (twoOptNeighborhood(tour,false).getCosts() - tour.getCosts() > 0)
+				{
+					tour = twoOptNeighborhood(tour,false);
+				}
+			}
 		}
 		else {
-			twoOptNeighborhood(tour, true);
+			while (twoOptNeighborhood(tour, true).getCosts() - tour.getCosts() != 0)
+			{
+				if(twoOptNeighborhood(tour,true).getCosts() - tour.getCosts() > 0)
+				{
+					tour = twoOptNeighborhood(tour,true);
+				}
+			};
 		}
-		throw new UnsupportedOperationException("method not implemented");
+		//throw new UnsupportedOperationException("method not implemented");
+		return tour;
 	}
 
 
