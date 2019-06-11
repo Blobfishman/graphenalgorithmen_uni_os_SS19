@@ -94,20 +94,24 @@ public class TwoOpt {
 		{
 			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
 
-				if (i <= 3) {
-					for (int x = 0; x <= i - 2; x++) {
-						new_tour = twoOptExchange(tour, x, i);
-						if (new_tour.getCosts() < best_tour.getCosts()) {
-							best_tour = new_tour;
+				if (i >= 3) {
+					for (int x = 0; x < (i - 2); x++) {
+						if(i != (x + 1) % tour.getVertices().length) {
+							new_tour = twoOptExchange(tour, x, i);
+							if (new_tour.getCosts() < best_tour.getCosts()) {
+								best_tour = new_tour;
+							}
 						}
 					}
-				}
+				} else {
 
-				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
-					new_tour = twoOptExchange(tour, i, x);
-					if(new_tour.getCosts() < best_tour.getCosts())
-					{
-						best_tour = new_tour;
+					for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
+						if(i != (x + 1) % tour.getVertices().length) {
+							new_tour = twoOptExchange(tour, i, x);
+							if (new_tour.getCosts() < best_tour.getCosts()) {
+								best_tour = new_tour;
+							}
+						}
 					}
 				}
 			}
@@ -118,20 +122,23 @@ public class TwoOpt {
 		else {
 			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
 
-				if (i <= 3) {
+				if (i >= 3) {
 					for (int x = 0; x <= i - 2; x++) {
-						new_tour = twoOptExchange(tour, x, i);
-						if (new_tour.getCosts() < best_tour.getCosts()) {
-							return new_tour;
+						if(i != (x + 1) % tour.getVertices().length) {
+							new_tour = twoOptExchange(tour, x, i);
+							if (new_tour.getCosts() < best_tour.getCosts()) {
+								return new_tour;
+							}
 						}
 					}
 				}
 
 				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
-					new_tour = twoOptExchange(tour, i, x);
-					if(new_tour.getCosts() < best_tour.getCosts())
-					{
-						return new_tour;
+					if(i != (x + 1) % tour.getVertices().length) {
+						new_tour = twoOptExchange(tour, i, x);
+						if (new_tour.getCosts() < best_tour.getCosts()) {
+							return new_tour;
+						}
 					}
 				}
 			}

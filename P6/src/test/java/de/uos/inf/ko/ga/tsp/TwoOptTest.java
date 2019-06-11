@@ -32,6 +32,35 @@ public class TwoOptTest {
 				// TODO: generate 100 random TSP tours and call TwoOpt.iterativeTwoOpt() on them
 				Tour[] randomTours = Tour.randomTour(graph);
 
+				for(int i = 0; i < randomTours.length -1; i++)
+				{
+					randomTours[i] = TwoOpt.iterativeTwoOpt(randomTours[i],false);
+				}
+
+				int best = Integer.MAX_VALUE;
+				int worst = 0;
+				double average = 0;
+
+				for(int i = 0; i < randomTours.length -1; i++)
+				{
+					if(randomTours[i].getCosts() > worst )
+					{
+						worst = i;
+					}
+
+					if(randomTours[i].getCosts() < best )
+					{
+						best = i;
+					}
+
+					average = average + randomTours[i].getCosts();
+				}
+
+				System.out.println("Die beste Tour ist: " + randomTours[best].toString() + "mit Kosten: " + randomTours[best].getCosts());
+				System.out.println("Die schlechteste Tour ist: " + randomTours[worst].toString() + "mit Kosten: " + randomTours[worst].getCosts());
+				System.out.println("Die durchschnittliche Tour hat eine Länge von: " + average/100);
+				System.out.println();
+
 				
 				// TODO: output minimum, maximum, and average tour length
 
