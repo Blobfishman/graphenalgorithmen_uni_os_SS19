@@ -73,7 +73,7 @@ public class Tour {
 			{
 				//Man erzeugt ein Array mit zufälligen Werten
 				int next = (int) (Math.random() * knoten.size());
-				random[j] = next;
+				random[j] = knoten.get(next);
 				knoten.remove(next);
 			}
 			// Die Tour wird dann im Array gespeichert

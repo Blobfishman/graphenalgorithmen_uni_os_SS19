@@ -46,7 +46,7 @@ public class TwoOptTest {
 				int worst = 0;
 				double average = 0;
 
-				for(int i = 0; i < randomTours.length -1; i++)
+				for(int i = 0; i < randomTours.length; i++)
 				{
 					if(randomTours[i].getCosts() > worst )
 					{

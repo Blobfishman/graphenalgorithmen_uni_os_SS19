@@ -36,33 +36,47 @@ public class TwoOpt {
 			pos2tonull = true;
 		}
 
-		int[] vertices = tour.getVertices();
-		int[] vertices2 = vertices;
+		int[] vertices = tour.getVertices().clone();
+		int[] vertices2 = vertices.clone();
 
 		if (!pos2tonull) {
 			//Fang im Array bei [pos1 +1] an und speichere alle ELemente von pos2 bis pos1 +1 dort
 
-			int i = pos1 + 1;
-			while (pos1suc >= pos1 + 1) {
-				vertices[i] = vertices2[pos1suc];
-				pos1suc--;
-				i++;
+			try {
+
+				int i = pos1 + 1;
+				while (pos1suc >= pos1 + 1) {
+					vertices[i] = vertices2[pos1suc];
+					pos1suc--;
+					i++;
+				}
+
+				//Addiere nun von Position i an Position pos1+1 alle Werte bis zum Ende
+
+				while (pos2 < vertices.length) {
+					if(i < vertices.length) {
+						vertices[i] = vertices2[pos2];
+						pos2++;
+						i++;
+					}
+					else {
+						pos2++;
+					}
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				e.printStackTrace();
 			}
 
-			//Addiere nun von Position i an Position pos1+1 alle Werte bis zum Ende
 
-			while (pos2 <= vertices.length - 1) {
-				vertices[i] = vertices2[pos2];
-				pos2++;
-				i++;
-			}
 		}
 
 		//v[0], v[pos1 + 1], v[pos1 + 2], ..., v[n - 1], v[pos1], v[pos1 - 1], ..., v[0]
 
 		else {
 			int i = 1;
-			while (pos1+1<= vertices.length - 1) {
+			while (pos1+1 < vertices.length - 1) {
 				vertices[i] = vertices2[pos1+1];
 				pos1++;
 				i++;
@@ -96,12 +110,21 @@ public class TwoOpt {
 		Tour best_tour = tour;
 		Tour new_tour = tour;
 
-		if(!firstFit)
-		{
-			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
-				if (i >= 2) {
-					for (int x = 0; x < i - 2; x++) {
-						new_tour = twoOptExchange(tour, x, i);
+		if(!firstFit) {
+			try {
+				for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
+					if (i >= 2) {
+						for (int x = 0; x < i - 2; x++) {
+							new_tour = twoOptExchange(tour, x, i);
+							if (new_tour.getCosts() < best_tour.getCosts()) {
+								best_tour = new_tour;
+							}
+						}
+					}
+
+
+					for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
+						new_tour = twoOptExchange(tour, i, x);
 						if (new_tour.getCosts() < best_tour.getCosts()) {
 							best_tour = new_tour;
 						}
@@ -109,17 +132,10 @@ public class TwoOpt {
 				}
 
 
-				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
-					new_tour = twoOptExchange(tour, i, x);
-					if (new_tour.getCosts() < best_tour.getCosts()) {
-						best_tour = new_tour;
-					}
-				}
+				return best_tour;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				e.printStackTrace();
 			}
-
-
-			return best_tour;
-
 		}
 		else {
 			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
@@ -144,7 +160,7 @@ public class TwoOpt {
 			return new_tour;
 
 		}
-
+		return new_tour;
 	}
 
 	/**
@@ -157,15 +173,11 @@ public class TwoOpt {
 	 */
 	public static Tour iterativeTwoOpt(Tour tour, boolean firstFit) {
 
-		if (!firstFit ){
-			while(twoOptNeighborhood(tour,false).getCosts() - tour.getCosts() != 0)
-			{
-				if (twoOptNeighborhood(tour,false).getCosts() - tour.getCosts() > 0)
-				{
-					tour = twoOptNeighborhood(tour,false);
-				}
+		if (!firstFit )
+		{
+			tour = twoOptNeighborhood(tour,false);
 			}
-		}
+
 		else {
 			while (twoOptNeighborhood(tour, true).getCosts() - tour.getCosts() != 0)
 			{
