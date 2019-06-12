@@ -56,28 +56,29 @@ public class Tour {
 	{
 		Tour[] randomTours = new Tour[100];
 
-		for (int i = 0; i < 100; i++)
-		{
+		for (int i = 0; i < 100; i++) {
 			// Man erstellt für alle Touren eine Liste
 			List<Integer> knoten = new ArrayList<>();
 
-			for (int k = 0; k < g.getVertexCount(); k++)
-			{
+			for (int k = 0; k < g.getVertexCount(); k++) {
 				//Man fügt alle Knoten ein
 				knoten.add(k);
 			}
 
 			int[] random = new int[g.getVertexCount()];
+			List<Integer> valList = new ArrayList<>();
 
-			for (int j = 0; j < g.getVertexCount(); j++)
-			{
+			for (int j = 0; j < random.length; j++)
+				valList.add(j);
+
+			for (int j = 0; j < g.getVertexCount(); j++) {
 				//Man erzeugt ein Array mit zufälligen Werten
-				int next = (int) (Math.random() * knoten.size());
-				random[j] = knoten.get(next);
-				knoten.remove(next);
+				int next = (int) (Math.random() * valList.size());
+				random[j] = valList.get(next);
+				valList.remove(next);
 			}
 			// Die Tour wird dann im Array gespeichert
-			randomTours[i] = new Tour(g,random);
+			randomTours[i] = new Tour(g, random);
 		}
 
 		return randomTours;

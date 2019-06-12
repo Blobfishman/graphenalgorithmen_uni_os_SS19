@@ -48,6 +48,8 @@ public class TwoOptTest {
 
 				for(int i = 0; i < randomTours.length; i++)
 				{
+					average = average + randomTours[i].getCosts();
+
 					if(randomTours[i].getCosts() > worst )
 					{
 						worst = i;
@@ -58,12 +60,13 @@ public class TwoOptTest {
 						best = i;
 					}
 
-					average = average + randomTours[i].getCosts();
 				}
 
-				System.out.println("Die beste Tour ist: " + randomTours[best].toString() + "mit Kosten: " + randomTours[best].getCosts());
-				System.out.println("Die schlechteste Tour ist: " + randomTours[worst].toString() + "mit Kosten: " + randomTours[worst].getCosts());
-				System.out.println("Die durchschnittliche Tour hat eine Länge von: " + average/100);
+
+
+				System.out.println("Die beste Tour ist: " + randomTours[best].toString());
+				System.out.println("Die schlechteste Tour ist: " + randomTours[worst].toString());
+				System.out.println("Die durchschnittliche Tour hat eine Länge von: " + (average/randomTours.length));
 				System.out.println();
 
 				
