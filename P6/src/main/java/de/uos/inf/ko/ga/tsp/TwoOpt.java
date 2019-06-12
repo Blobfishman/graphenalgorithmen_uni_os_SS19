@@ -40,29 +40,35 @@ public class TwoOpt {
 		int[] vertices2 = vertices;
 
 		if (!pos2tonull) {
+			//Fang im Array bei [pos1 +1] an und speichere alle ELemente von pos2 bis pos1 +1 dort
 
 			int i = pos1 + 1;
-			while (pos1suc != pos1 + 1) {
+			while (pos1suc >= pos1 + 1) {
 				vertices[i] = vertices2[pos1suc];
 				pos1suc--;
 				i++;
 			}
 
-			while (pos2 != vertices.length - 1) {
-				vertices[i] = vertices2[pos2 + 1];
+			//Addiere nun von Position i an Position pos1+1 alle Werte bis zum Ende
+
+			while (pos2 <= vertices.length - 1) {
+				vertices[i] = vertices2[pos2];
 				pos2++;
 				i++;
 			}
 		}
+
+		//v[0], v[pos1 + 1], v[pos1 + 2], ..., v[n - 1], v[pos1], v[pos1 - 1], ..., v[0]
+
 		else {
 			int i = 1;
-			while (pos1 != vertices.length -1) {
-				vertices[i] = vertices2[pos1 +1];
+			while (pos1+1<= vertices.length - 1) {
+				vertices[i] = vertices2[pos1+1];
 				pos1++;
 				i++;
 			}
 
-			while (pos2suc != -1)
+			while (pos2suc >= 0)
 			{
 				vertices[i] = vertices2[pos2suc];
 				pos2suc--;
@@ -93,60 +99,51 @@ public class TwoOpt {
 		if(!firstFit)
 		{
 			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
-
-				if (i >= 3) {
-					for (int x = 0; x < (i - 2); x++) {
-						if(i != (x + 1) % tour.getVertices().length) {
-							new_tour = twoOptExchange(tour, x, i);
-							if (new_tour.getCosts() < best_tour.getCosts()) {
-								best_tour = new_tour;
-							}
+				if (i >= 2) {
+					for (int x = 0; x < i - 2; x++) {
+						new_tour = twoOptExchange(tour, x, i);
+						if (new_tour.getCosts() < best_tour.getCosts()) {
+							best_tour = new_tour;
 						}
 					}
-				} else {
+				}
 
-					for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
-						if(i != (x + 1) % tour.getVertices().length) {
-							new_tour = twoOptExchange(tour, i, x);
-							if (new_tour.getCosts() < best_tour.getCosts()) {
-								best_tour = new_tour;
-							}
-						}
+
+				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
+					new_tour = twoOptExchange(tour, i, x);
+					if (new_tour.getCosts() < best_tour.getCosts()) {
+						best_tour = new_tour;
 					}
 				}
 			}
 
-			return new_tour;
+
+			return best_tour;
 
 		}
 		else {
 			for (int i = 0; i < tour.getGraph().getVertexCount(); i++) {
-
-				if (i >= 3) {
-					for (int x = 0; x <= i - 2; x++) {
-						if(i != (x + 1) % tour.getVertices().length) {
-							new_tour = twoOptExchange(tour, x, i);
-							if (new_tour.getCosts() < best_tour.getCosts()) {
-								return new_tour;
-							}
-						}
-					}
-				}
-
-				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
-					if(i != (x + 1) % tour.getVertices().length) {
-						new_tour = twoOptExchange(tour, i, x);
+				if (i >= 2) {
+					for (int x = 0; x < i - 2; x++) {
+						new_tour = twoOptExchange(tour, x, i);
 						if (new_tour.getCosts() < best_tour.getCosts()) {
 							return new_tour;
 						}
 					}
 				}
+
+
+				for (int x = i + 2; x < tour.getGraph().getVertexCount(); x++) {
+					new_tour = twoOptExchange(tour, i, x);
+					if (new_tour.getCosts() < best_tour.getCosts()) {
+						return new_tour;
+					}
+				}
 			}
+
 			return new_tour;
+
 		}
-
-
-
 
 	}
 

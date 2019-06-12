@@ -47,29 +47,36 @@ public class Tour {
 		}
 	}
 
+	/**
+	 * Es werden 100 random Touren an Hand des Graphen erstellt;
+	 * @param g
+	 * @return randomTours[];
+	 */
 	public static Tour[] randomTour(Graph g)
 	{
 		Tour[] randomTours = new Tour[100];
 
 		for (int i = 0; i < 100; i++)
 		{
+			// Man erstellt für alle Touren eine Liste
 			List<Integer> knoten = new ArrayList<>();
-			int number = g.getVertexCount();
 
-			for (int k = 0; k < number; k++)
+			for (int k = 0; k < g.getVertexCount(); k++)
 			{
-				knoten.add(i);
+				//Man fügt alle Knoten ein
+				knoten.add(k);
 			}
 
 			int[] random = new int[g.getVertexCount()];
 
 			for (int j = 0; j < g.getVertexCount(); j++)
 			{
+				//Man erzeugt ein Array mit zufälligen Werten
 				int next = (int) (Math.random() * knoten.size());
 				random[j] = next;
 				knoten.remove(next);
 			}
-
+			// Die Tour wird dann im Array gespeichert
 			randomTours[i] = new Tour(g,random);
 		}
 

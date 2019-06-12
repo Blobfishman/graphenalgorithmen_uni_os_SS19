@@ -30,12 +30,17 @@ public class TwoOptTest {
 				assertNotNull(graph);
 				
 				// TODO: generate 100 random TSP tours and call TwoOpt.iterativeTwoOpt() on them
+
+				//Ich nutze meine Funktion um automatisch 100 random touren zu bauen
 				Tour[] randomTours = Tour.randomTour(graph);
 
-				for(int i = 0; i < randomTours.length -1; i++)
+				for(int i = 0; i < randomTours.length ; i++)
 				{
+					//für alle 100 berechne ich die kürzeste tour
 					randomTours[i] = TwoOpt.iterativeTwoOpt(randomTours[i],false);
 				}
+
+				// Es werden die kürzeste, die längste und die durschnittliche Distanz gesucht und ausgegeben.
 
 				int best = Integer.MAX_VALUE;
 				int worst = 0;
